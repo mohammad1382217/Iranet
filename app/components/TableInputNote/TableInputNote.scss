@@ -1,0 +1,49 @@
+.ant-dropdown {
+  z-index: 99999;
+}
+
+.ant-table-container {
+  overflow-x: scroll;
+}
+
+.ant-table-content {
+  width: 55rem;
+}
+
+.ant-pagination {
+  display: flex;
+  justify-content: center !important;
+  width: 100%;
+  flex-direction: row-reverse;
+}
+
+@media screen and (min-width: 1080px) {
+  .ant-table-content {
+    width: 100%;
+  }
+  .ant-table-container {
+    overflow-x: hidden;
+  }
+}
+
+@media screen and (max-width: 540px) {
+}
+
+.ant-btn-primary {
+  background-color: #2dcea2;
+}
+.ant-btn-primary:hover {
+  background-color: #2dcea3cc !important;
+}
+.ant-btn-primary:focus {
+  background-color: #26b891 !important;
+}
+
+.ant-table-filter-dropdown-btns .ant-btn-link {
+  color: #b71c1c !important;
+}
+
+/* .custom-calendar.rmdp-wrapper,
+.rmdp-container .custom-calendar.ep-arrow::after {
+    margin: 0.3rem;
+} */

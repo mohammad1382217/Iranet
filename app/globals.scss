@@ -1,0 +1,113 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import "font";
+@import "color";
+
+* {
+  margin: 0;
+  padding: 0;
+  font-family: $font-family-Estedad-FD !important;
+}
+
+*,
+::after,
+::before {
+  box-sizing: border-box !important;
+}
+
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+}
+
+.rmdp-container {
+  width: 100% !important;
+}
+
+body {
+  overflow-y: auto;
+}
+
+::-webkit-scrollbar {
+  width: 0.25rem;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: $default-track-color;
+}
+
+// .admin ::-webkit-scrollbar-track {
+//   background: $admin-track-color !important;
+// }
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: $default-thumb-color;
+  border-radius: 4px;
+}
+
+// .admin ::-webkit-scrollbar-thumb {
+//   background: $admin-thumb-color !important;
+// }
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: rgba($default-thumb-color, 0.78);
+}
+
+// .admin ::-webkit-scrollbar-thumb:hover {
+//   background: rgba($admin-thumb-color, 0.78) !important;
+// }
+
+/// don't delete
+.backdrop-blur-sm {
+  position: fixed;
+}
+
+.ant-upload {
+  width: 100%;
+}
+
+.my-custom-upload .ant-upload-list-item {
+  background-color: #2dcea2;
+  width: 40%;
+}
+
+label {
+  padding: 0 !important;
+}
+
+div.ml-3.mr-12 {
+  margin-right: 0;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+div[class="shrink-0"] {
+  margin-top: 0.15rem;
+}
+
+.ant-upload-list-item-actions{
+  display: none;
+}
+.ant-upload-list-item{ 
+  margin: 0;
+  width: 15rem;
+
+}
+.ant-upload-list-item-done{
+  width: 15rem !important;
+  border-bottom-right-radius:1px !important;
+
+}
+.ant-upload-list-item:hover{
+  background-color: #2dcea2 !important;
+}
