@@ -32,7 +32,7 @@ react-ts
 ```
 **select name Project**
 ```bash
-customer_management_system
+Iranet
 ```
 **Run Project**
 ```bash
