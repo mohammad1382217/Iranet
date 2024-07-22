@@ -1,55 +1,36 @@
+import React, { Suspense } from "react";
+import * as yup from "yup";
+import axios from "axios";
+import "react-toastify/dist/ReactToastify.css";
+import axiosInstance from "../api/apiConfig";
+import loginBg from "../assets/images/login-bg.webp";
+import { Link, useNavigate } from "react-router-dom";
+import { H1Title, Parag } from "../components/tools";
+import { ToastContainer, toast } from "react-toastify";
+import { validateIranianNationalCode } from "../Login/page";
+import { ErrorMessage, Field, Form, Formik } from "formik";
+import SkeletonButton from "antd/lib/skeleton/Button";
 import {
   useDispatch,
   appSlice,
-  logins,
-  loginSlice,
   useSelector,
-  selectLogin,
-  selectShowModal,
+  selectShowModals,
+  fetchAddAccountThunk,
 } from "../../lib/redux";
-import { ErrorMessage, Field, FieldProps, Form, Formik } from "formik";
-import DatePicker, { DateObject } from "react-multi-date-picker";
-import persian_fa from "react-date-object/locales/persian_fa";
-import persian from "react-date-object/calendars/persian";
-import { Link, useNavigate } from "react-router-dom";
-import { H1Title, Parag } from "../components/tools";
-import Button_component from "../components/Button";
-import loginBg from "../assets/images/login-bg.png";
-import { Button, Typography } from "@material-tailwind/react";
-import Select from "../components/select";
-import Modal from "../components/Modal";
-import { hash } from "../Login/page";
-import * as yup from "yup";
-import React from "react";
-import { IoEllipseOutline } from "react-icons/io5";
-import axios from "axios";
-import { BASE_URL } from "../api/apiConfig";
+
+const Modal = React.lazy(() => import("../components/Modal"));
+const ButtonComponent = React.lazy(() => import("../components/Button"));
+const ArrowRightCircleIcon = React.lazy(
+  () => import("@heroicons/react/24/outline/ArrowRightCircleIcon")
+);
+const Button = React.lazy(() => import("antd/es/button/index"));
 
 export const weekDays = ["ش", "ی", "د", "س", "چ", "پ", "ج"];
 
-const validateIranianNationalCode = (nationalCode: string): boolean => {
-  if (/^[0-9]{10}$/.test(nationalCode)) {
-    const check = parseInt(nationalCode[9]);
-    let sum = 0;
-    for (let i = 0; i < 9; i++) {
-      sum += parseInt(nationalCode[i]) * (10 - i);
-    }
-    const reminder = sum % 11;
-
-    if (
-      (reminder < 2 && check === reminder) ||
-      (reminder >= 2 && check === 11 - reminder)
-    ) {
-      return true;
-    }
-  }
-  return false;
-};
-
 const validationSchema = yup.object().shape({
-  store_name: yup.string().required("وارد کردن عنوان فروشگاه الزامی می باشد."),
-  owner_name: yup.string().required("وارد کردن نام مالک الزامی می باشد."),
-  owner_nid: yup
+  first_name: yup.string().required("وارد کردن نام الزامی می باشد."),
+  last_name: yup.string().required("وارد کردن نام خانوادگی الزامی می باشد."),
+  nid: yup
     .string()
     .required("وارد کردن کدملی الزامی می باشد.")
     .test(
@@ -57,43 +38,42 @@ const validationSchema = yup.object().shape({
       " کد ملی معتبر نمی باشد.",
       validateIranianNationalCode
     ),
-  owner_birthdate: yup
-    .string()
-    .required("وارد کردن تاریخ تولد الزامی می باشد."),
-  owner_phone: yup
+    phone_number: yup
     .string()
     .required("وارد کردن شماره تماس الزامی می باشد.")
-    .matches(/((0?9)|(\+?989))\d{9}/g, "شماره تلفن را درست وارد کنید"),
-  store_phone: yup.string().required("وارد کردن تلفن محل کار الزامی می باشد."),
-  store_address: yup
-    .string()
-    .required("وارد کردن آدرس فروشگاه الزامی می باشد."),
-  store_post_code: yup
-    .string()
-    .required("وارد کردن کدپستی فروشگاه الزامی می باشد.")
-    .matches(/(?<!\d)\d{10}(?!\d)$/, "کد پستی 10 رقمی را درست وارد کنید"),
-  store_password: yup
-    .string()
-    .required("وارد کردن رمز عبور فروشگاه الزامی می باشد.")
     .matches(
-      /^(?=.*[A-Za-z])(?=.*\d).{8,}$/,
-      "پسورد باید حداقل ۸ کاراکتر و شامل حروف و اعداد باشد."
+      /^09([0][1-5]|[1][0-9]|[3][1-9]|[2][1-9]|[9][0-9])[0-9]{7}$/,
+      "شماره تلفن را درست وارد کنید"
     ),
-  store_department: yup
-    .string()
-    .required("وارد کردن صنف فروشگاه الزامی می باشد."),
 });
 
 const Register: React.FC = () => {
-  const navigate = useNavigate();
   const dispatch = useDispatch();
-  const login = useSelector(selectLogin);
-  const showModal = useSelector(selectShowModal);
-  const showModalHandler = () => dispatch(appSlice.actions.setShowModal());
+  const navigate = useNavigate();
+
+  const showModals = useSelector(selectShowModals);
+  const showModalHandler = () =>
+    dispatch(appSlice.actions.setShowModals("showModalOrigin"));
+  const showModalSeccessFullyRegisterHandler = () =>
+    dispatch(appSlice.actions.setShowModals("showModalSeccessFullyRegister"));
+
+  const showToastSuccessMessage = () => {
+    toast.success( "ساخت حساب با موفقیت انجام شد.",
+      {
+        position: "top-center",
+      }
+    );
+  };
+
+  const showToastMessage = () => {
+    toast.error("خطایی سمت سرور رخ داده لطفا بعد از مدتی دوباره تلاش کنید!", {
+      position: "top-center",
+    });
+  };
 
   return (
     <div
-      className="flex flex-col justify-end items-center w-screen min-h-screen m-auto !overflow-auto gap-20"
+      className="flex flex-col justify-center items-center w-full min-h-screen m-auto !overflow-auto gap-20"
       style={{
         backgroundImage: `url(${loginBg})`,
         backgroundSize: "cover",
@@ -101,363 +81,216 @@ const Register: React.FC = () => {
       }}
     >
       <Formik
-        initialValues={login}
+        initialValues={{
+          first_name: "",
+          last_name: "",
+          nid: "",
+          phone_number: "",
+        }}
         onSubmit={(values) => {
           // Handle form submission
           if (values) {
-            showModalHandler();
-          }
-          console.log("Final form values:", values);
-          const handlePostRegister = async () => {
-            try {
-              const response = await axios.post(`${BASE_URL}register`, values);
-              const data = response.data;
-              // dispatch(setLoginData([...LoginData, data]));
-            } catch (error: any) {
-              if (error.response) {
-                console.log(error.message);
+            console.log(values);
+            const handlePostRegister = async () => {
+              try {
+                await dispatch(fetchAddAccountThunk(values)).unwrap();
+                navigate("/login");
+                showToastSuccessMessage();
+              } catch (error: any) {
+                if (axios.isCancel(error)) {
+                  showToastMessage();
+                  console.log("Request canceled:", error.message);
+                } else {
+                  showToastMessage();
+                  console.error("Error fetching data:", error);
+                }
               }
-            }
-          };
-          handlePostRegister();
+            };
+            handlePostRegister();
+          }
           // You can perform further actions with the form values here
         }}
         validationSchema={validationSchema}
       >
-        {({ handleChange, handleBlur, values, setFieldValue }) => (
-          <div className="flex flex-col justify-center items-end rounded-lg p-6 bg-white mx-auto mt-28">
-            <Form
-              className="flex flex-col justify-center items-center"
-              action=""
-            >
-              <div className="max-w-sm w-full">
-                <div>
-                  <div className="mt-10">
+        {({ handleChange }) => (
+          <Form
+            className="flex flex-col items-center justify-center bg-white w-[381px] sm-max:w-[320px] rounded-lg p-6 mt-28"
+            action=""
+          >
+            <div className="max-w-sm w-full">
+              <div className="flex flex-col gap-2">
+                <H1Title
+                  BoldTitle={"ساخت حساب کاربری جدید"}
+                  H1class={"h-9 w-[16.5rem] text-2xl text-right font-semibold"}
+                />
+                <Parag
+                  Paragraph={"برای ساخت حساب جدید، اطلاعات خود را وارد کنید."}
+                  Pclass={"text-base text-gray-600 text-right font-normal"}
+                />
+              </div>
+
+              <div className="pt-8 pb-6 grid gap-3">
+                <Field
+                  placeholder="نام"
+                  type="text"
+                  className="outline-0 bg-white h-10 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3"
+                  name="first_name"
+                  onChange={handleChange}
+                />
+                <ErrorMessage
+                  name="first_name"
+                  component="div"
+                  className="text-red-500 text-sm"
+                />
+                <Field
+                  placeholder="نام خانوادگی"
+                  type="text"
+                  className="outline-0 bg-white h-10 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3"
+                  name="last_name"
+                  onChange={handleChange}
+                />
+                <ErrorMessage
+                  name="last_name"
+                  component="div"
+                  className="text-red-500 text-sm"
+                />
+                <Field
+                  placeholder="کد ملی"
+                  type="text"
+                  className="outline-0 bg-white h-10 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3"
+                  name="nid"
+                  onChange={handleChange}
+                />
+                <ErrorMessage
+                  name="nid"
+                  component="div"
+                  className="text-red-500 text-sm"
+                />
+                <Field
+                  placeholder="شماره تماس"
+                  type="text"
+                  className="outline-0 bg-white h-10 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3"
+                  name="phone_number"
+                  onChange={handleChange}
+                />
+                <ErrorMessage
+                  name="phone_number"
+                  component="div"
+                  className="text-red-500 text-sm"
+                />
+              </div>
+              <div className="grid gap-4 mb-10">
+                <p
+                  lang="fa"
+                  role="text"
+                  className="text-sm font-medium text-gray-600"
+                >
+                  ساخت حساب به منزله تایید{" "}
+                  <span
+                    onClick={showModalHandler}
+                    className="text-sm font-semibold text-textColor mx-1 cursor-pointer select-none"
+                  >
+                    قوانین و مقررات
+                  </span>{" "}
+                  سامانه است
+                </p>
+                <Suspense fallback={<SkeletonButton />}>
+                  <ButtonComponent
+                    Type="submit"
+                    ButtonClass={
+                      "w-full gap-2 text-sm px-[1.125rem] py-2.5 text-white rounded-lg bg-secondary hover:bg-hover-secondary shadow-gray-500/20"
+                    }
+                  >
+                    ساخت حساب
+                  </ButtonComponent>
+                </Suspense>
+                <div className="flex items-center justify-center">
+                  <Parag
+                    Paragraph={"در حال حاضر حساب کاربری دارد؟"}
+                    Pclass={"text-sm font-medium text-gray-600"}
+                  />
+                  <Link to={"/Login"}>
+                    <Parag
+                      Paragraph={"وارد شوید"}
+                      Pclass={"text-sm font-semibold text-textColor mx-1"}
+                    />
+                  </Link>
+                </div>
+              </div>
+            </div>
+            <Suspense fallback={<div>loading...</div>}>
+              <Modal
+                modalClass="!min-w-[30%]"
+                modalHeader={
+                  <div className="flex flex-col gap-2">
                     <H1Title
-                      BoldTitle={"ساخت حساب کاربری جدید"}
+                      BoldTitle={"قوانین و مقررات"}
                       H1class={
                         "h-9 w-[16.5rem] text-2xl text-right font-semibold"
                       }
                     />
-                  </div>
-                  <div>
                     <Parag
                       Paragraph={
-                        "برای ساخت حساب جدید، اطلاعات خود را وارد کنید."
+                        "قوانین و مقررات کاربران سامانه باشگاه مشتریان ایرانت"
                       }
                       Pclass={"text-base text-gray-600 text-right font-normal"}
                     />
                   </div>
-                </div>
-                <div className="py-8 grid gap-3">
-                  <Field
-                    placeholder="عنوان فروشگاه"
-                    type="text"
-                    className="outline-0 bg-white h-10 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3"
-                    name="store_name"
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                      handleChange(e);
-                      const { name, value } = e.target;
-                      setFieldValue(name, value);
-                      dispatch(
-                        loginSlice.actions.setLogin({
-                          key: name as keyof logins,
-                          value: value,
-                        })
-                      );
-                    }}
-                  />
-                  <ErrorMessage
-                    name="store_name"
-                    component="div"
-                    className="text-red-500 text-sm"
-                  />
-                  <Field
-                    placeholder="نام مالک"
-                    type="text"
-                    className="outline-0 bg-white h-10 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3"
-                    name="owner_name"
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                      handleChange(e);
-                      const { name, value } = e.target;
-                      setFieldValue(name, value);
-                      dispatch(
-                        loginSlice.actions.setLogin({
-                          key: name as keyof logins,
-                          value: value,
-                        })
-                      );
-                    }}
-                  />
-                  <ErrorMessage
-                    name="owner_name"
-                    component="div"
-                    className="text-red-500 text-sm"
-                  />
-                  <Field
-                    placeholder="کد ملی"
-                    type="text"
-                    className="outline-0 bg-white h-10 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3"
-                    name="owner_nid"
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                      handleChange(e);
-                      const { name, value } = e.target;
-                      setFieldValue(name, value);
-                      dispatch(
-                        loginSlice.actions.setLogin({
-                          key: name as keyof logins,
-                          value: value,
-                        })
-                      );
-                    }}
-                  />
-                  <ErrorMessage
-                    name="owner_nid"
-                    component="div"
-                    className="text-red-500 text-sm"
-                  />
-                  <Field name="owner_birthdate">
-                    {({ field }: FieldProps) => (
-                      <DatePicker
-                        {...field}
-                        weekDays={weekDays}
-                        calendar={persian}
-                        locale={persian_fa}
-                        calendarPosition="bottom-right"
-                        inputClass="outline-0 bg-white h-10 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3"
-                        id="BirthdayDate"
-                        placeholder="تاریخ تولد"
-                        format="YYYY/MM/DD" // Set the date format as needed
-                        onChange={(date: DateObject | DateObject[] | null) => {
-                          if (date instanceof DateObject) {
-                            setFieldValue(
-                              "owner_birthdate",
-                              date
-                                .convert(persian, persian_fa)
-                                .format()
-                                .toString()
-                            );
-                            dispatch(
-                              loginSlice.actions.setLogin({
-                                key: "owner_birthdate",
-                                value: date
-                                  .convert(persian, persian_fa)
-                                  .format()
-                                  .toString(),
-                              })
-                            );
-                          }
-                        }}
-                      />
-                    )}
-                  </Field>
-                  <ErrorMessage
-                    name="owner_birthdate"
-                    component="div"
-                    className="text-red-500 text-sm"
-                  />
-                  <Field
-                    placeholder="شماره تماس"
-                    type="text"
-                    className="outline-0 bg-white h-10 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3"
-                    name="owner_phone"
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                      handleChange(e);
-                      const { name, value } = e.target;
-                      setFieldValue(name, value);
-                      dispatch(
-                        loginSlice.actions.setLogin({
-                          key: name as keyof logins,
-                          value: value,
-                        })
-                      );
-                    }}
-                  />
-                  <ErrorMessage
-                    name="owner_phone"
-                    component="div"
-                    className="text-red-500 text-sm"
-                  />
-                  <Field
-                    placeholder="تلفن محل کار"
-                    type="text"
-                    className="outline-0 bg-white h-10 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3"
-                    name="store_phone"
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                      handleChange(e);
-                      const { name, value } = e.target;
-                      setFieldValue(name, value);
-                      dispatch(
-                        loginSlice.actions.setLogin({
-                          key: name as keyof logins,
-                          value: value,
-                        })
-                      );
-                    }}
-                  />
-                  <ErrorMessage
-                    name="store_phone"
-                    component="div"
-                    className="text-red-500 text-sm"
-                  />
-                  <Field
-                    placeholder="آدرس فروشگاه"
-                    type="text"
-                    className="outline-0 bg-white h-10 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3"
-                    name="store_address"
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                      handleChange(e);
-                      const { name, value } = e.target;
-                      setFieldValue(name, value);
-                      dispatch(
-                        loginSlice.actions.setLogin({
-                          key: name as keyof logins,
-                          value: value,
-                        })
-                      );
-                    }}
-                  />
-                  <ErrorMessage
-                    name="store_address"
-                    component="div"
-                    className="text-red-500 text-sm"
-                  />
-                  <Field
-                    placeholder="کد پستی"
-                    type="text"
-                    className="outline-0 bg-white h-10 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3"
-                    name="store_post_code"
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                      handleChange(e);
-                      const { name, value } = e.target;
-                      setFieldValue(name, value);
-                      dispatch(
-                        loginSlice.actions.setLogin({
-                          key: name as keyof logins,
-                          value: value,
-                        })
-                      );
-                    }}
-                  />
-                  <ErrorMessage
-                    name="store_post_code"
-                    component="div"
-                    className="text-red-500 text-sm"
-                  />
-                  <Select
-                    options={["لباس فروشی", "نانوایی", "سوپرمارکتی"]}
-                    Selectclass={
-                      "appearance-none block w-full py-2.5 px-3 text-sm font-normal text-[#90A4AE] bg-transparent bg-clip-padding bg-no-repeat border border-solid border-gray-300 rounded-lg transition ease-in-out focus:bg-white focus:border-blue-500 focus:outline-none"
-                    }
-                    SelectName={"store_department"}
-                    SelectOnChange={(
-                      e: React.ChangeEvent<HTMLSelectElement>
-                    ) => {
-                      handleChange(e);
-                      const { name, value } = e.target;
-                      setFieldValue(name, value);
-                      dispatch(
-                        loginSlice.actions.setLogin({
-                          key: name as keyof logins,
-                          value: value,
-                        })
-                      );
-                    }}
-                    DefaultValue={""}
-                    oneOptionText={"انتخاب صنف"}
-                  />
-                  <ErrorMessage
-                    name="store_department"
-                    component="div"
-                    className="text-red-500 text-sm"
-                  />
-                  <Field
-                    placeholder="رمز عبور"
-                    type="password"
-                    className="outline-0 bg-white h-10 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3"
-                    name="store_password"
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                      handleChange(e);
-                      const { name, value } = e.target;
-                      setFieldValue(name, value);
-                      dispatch(
-                        loginSlice.actions.setLogin({
-                          key: name as keyof logins,
-                          value: hash(e),
-                        })
-                      );
-                    }}
-                  />
-                  <ErrorMessage
-                    name="store_password"
-                    component="div"
-                    className="text-red-500 text-sm"
-                  />
-                </div>
-                <div className="grid gap-4 mb-10">
-                  <Button_component
-                    Type="submit"
-                    children={"ساخت حساب"}
-                    ButtonClass={
-                      "w-full gap-2 text-sm px-[1.125rem] py-2.5 text-white rounded-lg bg-secondary hover:bg-hover-secondary shadow-gray-500/20"
-                    }
-                  />
-                  <div className="flex items-center justify-center">
-                    <Parag
-                      Paragraph={"در حال حاضر حساب کاربری دارد؟"}
-                      Pclass={"text-sm font-medium text-gray-600"}
-                    />
-                    <Link to={"/Login"}>
-                      <Parag
-                        Paragraph={"وارد شوید"}
-                        Pclass={
-                          "text-sm font-medium text-[#151515] mx-1 font-medium"
-                        }
-                      />
-                    </Link>
-                  </div>
-                </div>
-              </div>
-              <Modal
-                // modalClass="p-6"
-                modalHeader={"اطلاعات با موفقیت ثبت شد"}
-                modalBody={
-                  "پس از بررسی و تایید اطلاعات ، پیام فعال سازی برای حساب شما ارسال میگردد."
                 }
-                modalFooterClass="flex justify-between items-center"
-                modalFooter={
+                modalBodyClass="!py-0"
+                modalBody={
                   <>
-                    <Button
-                      variant="gradient"
-                      color="green"
-                      onClick={() => {
-                        showModalHandler();
-                        navigate("/store/Supplementaryform");
-                      }}
-                    >
-                      <span>تایید</span>
-                    </Button>
-                    <Button
-                      variant="text"
-                      color="red"
-                      onClick={showModalHandler}
-                      className="mr-1"
-                    >
-                      <span>لغو</span>
-                    </Button>
+                    <ol className="list-decimal pr-5">
+                      <li>
+                        Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                        Voluptate, iste nemo nisi rem labore molestiae magni
+                        nobis provident et voluptas quae mollitia eligendi quam
+                        laborum non veniam repellat libero dolorem.
+                      </li>
+                      <li>
+                        Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                        Voluptate, iste nemo nisi rem labore molestiae magni
+                        nobis provident et voluptas quae mollitia eligendi quam
+                        laborum non veniam repellat libero dolorem.
+                      </li>
+                      <li>
+                        Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                        Voluptate, iste nemo nisi rem labore molestiae magni
+                        nobis provident et voluptas quae mollitia eligendi quam
+                        laborum non veniam repellat libero dolorem.
+                      </li>
+                    </ol>
                   </>
                 }
-                Open={showModal}
+                modalFooter={
+                  <Button
+                    onClick={() => {
+                      showModalHandler();
+                      showModalSeccessFullyRegisterHandler();
+                    }}
+                    type="link"
+                    className="flex items-center justify-center mt-1 mb-5 mx-auto !outline-0 active:!border-none active:!outline-none"
+                    icon={
+                      <ArrowRightCircleIcon
+                        color="#E53935"
+                        strokeWidth={2.5}
+                        className={"h-3.5 w-3.5 mx-auto"}
+                      />
+                    }
+                  >
+                    <span className="text-sm text-textColor font-medium outline-0 hover:border-none">
+                      برگشت
+                    </span>
+                  </Button>
+                }
+                Open={showModals.showModalOrigin}
                 HandleOpen={showModalHandler}
               />
-            </Form>
-          </div>
+            </Suspense>
+          </Form>
         )}
       </Formik>
-      <section className="flex justify-center items-center text-secondary gap-4 mb-10 mx-auto">
-        <IoEllipseOutline className="w-7 h-7 stroke-[3px]" />
-        <Typography className="text-4xl font-normal">ایرانت</Typography>
-      </section>
+      <ToastContainer rtl={true} />
     </div>
   );
 };

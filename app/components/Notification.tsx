@@ -1,26 +1,44 @@
 import React from "react";
 
-export const Notification: React.FC<{ NotificatonClass: string }> = ({
-  NotificatonClass
+const Notification: React.FC<NotificationProps> = ({
+  NotificationClass,
+  NotificationHeader,
+  NotificationId,
+  NotificationIdClass,
+  footerTitle,
+  footerDate,
+  children,
 }) => {
   return (
     <div
-      className={`p-2 bg-white flex flex-col rounded-lg justify-center gap-4 ${NotificatonClass}`}
+      className={`p-2.5 bg-white flex flex-col rounded-lg justify-center gap-4 ${NotificationClass}`}
     >
-      <h2 className="text-base 2xl:!text-sm 3xl:text-base font-medium">
-        متن عنوان اعلان نمونه شماره 1
-      </h2>
+      <div className="w-full flex items-center justify-between">
+        <h2 className="text-lg 2xl-max:!text-sm 3xl-max:text-base font-medium text-textColor">
+          {NotificationHeader}
+        </h2>
+        <span className={`text-xs font-light hidden ${NotificationIdClass}`}>{NotificationId}</span>
+      </div>
       <div className="h-[1px] mx-auto w-10/12 bg-blue-gray-50"></div>
-      <p className="font-normal text-sm">
-        لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ است.
-      </p>
+      <p lang="fa" role="text" className="font-normal text-sm">{children}</p>
       <div className="h-[1px] mx-auto w-10/12 bg-blue-gray-50"></div>
       <div className="flex flex-row justify-between w-full">
-        <div className="font-light text-xs text-black/90">تاریخ :</div>
-        <div className="font-light text-xs text-[#262626]">
-          1400/00/00
-        </div>
+        <div className="font-light text-xs text-black/90">{footerTitle}</div>
+        <div className="font-light text-xs text-[#262626]">{footerDate}</div>
       </div>
     </div>
   );
 };
+
+export default Notification;
+
+// Types
+interface NotificationProps {
+  NotificationClass?: string;
+  NotificationHeader?: string;
+  NotificationId?: string;
+  NotificationIdClass?: string;
+  footerTitle?: string;
+  footerDate?: string;
+  children?: React.ReactNode;
+}

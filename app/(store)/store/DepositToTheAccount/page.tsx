@@ -1,16 +1,19 @@
 import React from "react";
-import { Button, Input, Upload, UploadProps, message } from "antd";
-import { ArrowRightCircleIcon } from "@heroicons/react/24/outline";
-import { NavLink, useNavigate } from "react-router-dom";
 import { Parag } from "../../../components/tools";
-import Button_component from "../../../components/Button";
-import { useDispatch } from "../../../../lib/redux";
-import Textarea from "../../../components/TextArea";
-import { UploadOutlined } from "@ant-design/icons";
-import DatePicker from "react-multi-date-picker";
 import { weekDays } from "../../../Register/page";
+import UploadOutlined from "@ant-design/icons/UploadOutlined";
+import { Link, useNavigate } from "react-router-dom";
+import Textarea from "../../../components/TextArea";
 import persian from "react-date-object/calendars/persian";
 import persian_fa from "react-date-object/locales/persian_fa";
+const DatePicker = React.lazy(() => import("react-multi-date-picker"));
+const ButtonComponent = React.lazy(() => import("../../../components/Button"));
+const Button = React.lazy(() => import( "antd/es/button/index"));
+const Input = React.lazy(() => import( "antd/es/input/index"));
+import Upload from "antd/es/upload/Upload";
+import type { UploadProps } from "antd/es/upload/Upload";
+import message from "antd/es/message/index";
+import ArrowRightCircleIcon from "@heroicons/react/24/outline/ArrowRightCircleIcon";
 
 const props: UploadProps = {
   name: "file",
@@ -41,9 +44,9 @@ const props: UploadProps = {
 
 const DepositToTheAccount: React.FC = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
   return (
-    <div className="container flex flex-col justify-center rounded-lg max-w-sm mx-auto gap-10 mt-14 p-6">
+    <div className="container flex flex-col justify-center rounded-lg max-w-sm mx-auto gap-10 mt-14 p-4 px-0">
+      
       <Parag Paragraph={"واریز به حساب"} Pclass={"text-2xl font-semibold"} />
       <div className="flex flex-col gap-3.5">
         <div className="flex flex-col gap-3.5">
@@ -85,15 +88,15 @@ const DepositToTheAccount: React.FC = () => {
           />
         </div>
         <div className="grid w-full items-center mt-[1.125rem]">
-          <Button_component
+          <ButtonComponent
             ButtonClass={
               "w-full gap-2 text-sm px-[1.125rem] py-2.5 text-white rounded-lg bg-secondary hover:bg-hover-secondary shadow-gray-500/20"
             }
-            onClick={() => navigate("/store/ChargeAccount")}
+            onClick={() => navigate("/store/FailedPayment")}
           >
             تایید
-          </Button_component>
-          <NavLink to={`/store/ChargeAccount`}>
+          </ButtonComponent>
+          <Link to={`/store/`}>
             <Button
               type="link"
               className="flex items-center justify-center mt-1 mb-5 mx-auto"
@@ -105,12 +108,12 @@ const DepositToTheAccount: React.FC = () => {
                 />
               }
             >
-              <span className="text-sm text-[#151515] font-medium">
+              <span className="text-sm text-textColor font-medium">
                 <span className="text-[#757575]">لغو عملیات و</span> برگشت به
                 داشبورد
               </span>
             </Button>
-          </NavLink>
+          </Link>
         </div>
       </div>
     </div>

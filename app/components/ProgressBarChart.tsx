@@ -1,4 +1,7 @@
 import React from "react";
+import { Bar } from "react-chartjs-2";
+import type { chartListType } from "../(store)/store/Dashboard/page";
+
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -10,8 +13,6 @@ import {
   ChartOptions,
   ChartData,
 } from "chart.js";
-import { Bar } from "react-chartjs-2";
-import { chartListType } from "../(store)/store/Dashboard/page";
 
 ChartJS.register(
   CategoryScale,
@@ -110,63 +111,26 @@ const ProgressBarChart: React.FC<ProgressBarChartProp> = ({ chartData }) => {
     ],
   };
 
+  const labelStyles = (index: number) => {
+    const topValue = `${index * 4}rem`;
+    return {
+      top: topValue,
+    };
+  };
+
   return (
     <>
       <div className="relative">
-      {chartDatalables.map((item, index) => {
-        switch (index) {
-          case 0:
-            return (
-              <div
-                className="flex items-center justify-between container pr-2 absolute -top-[0.25rem] text-xs font-semibold text-gray-900 text-right"
-                key={index}
-              >
-                <span>{item}</span>
-                <span className='text-blue-gray-500'>{`${chartPercentage[index]}%`}</span>
-              </div>
-            );
-          case 1:
-            return (
-              <div
-                className="flex items-center justify-between container pr-2 absolute top-[2.125rem] text-xs font-semibold text-gray-900 text-right"
-                key={index}
-              >
-                <span>{item}</span>
-                <span className='text-blue-gray-500'>{`${chartPercentage[index]}%`}</span>
-              </div>
-            );
-          case 2:
-            return (
-              <div
-                className="flex items-center justify-between container pr-2 absolute top-[4.5rem] text-xs font-semibold text-gray-900 text-right"
-                key={index}
-              >
-                <span>{item}</span>
-                <span className='text-blue-gray-500'>{`${chartPercentage[index]}%`}</span>
-              </div>
-            );
-          case 3:
-            return (
-              <div
-                className="flex items-center justify-between container pr-2 absolute top-[7rem] text-xs font-semibold text-gray-900 text-right"
-                key={index}
-              >
-                <span>{item}</span>
-                <span className='text-blue-gray-500'>{`${chartPercentage[index]}%`}</span>
-              </div>
-            );
-          case 4:
-            return (
-              <div
-                className="flex items-center justify-between container pr-2 absolute top-[9.25rem] text-xs font-semibold text-gray-900 text-right"
-                key={index}
-              >
-                <span>{item}</span>
-                <span className='text-blue-gray-500'>{`${chartPercentage[index]}%`}</span>
-              </div>
-            );
-        }
-      })}
+        {chartDatalables.map((item, index) => (
+          <div
+            className="flex items-center justify-between container pr-2 absolute text-xs font-semibold text-gray-900 text-right"
+            key={index}
+            style={labelStyles(index)}
+          >
+            <span>{item}</span>
+            <span className="text-blue-gray-500">{`${chartPercentage[index]}%`}</span>
+          </div>
+        ))}
       </div>
       <div className="flex relative">
         <Bar width={360} height={200} data={data} options={options} />
@@ -176,6 +140,7 @@ const ProgressBarChart: React.FC<ProgressBarChartProp> = ({ chartData }) => {
 };
 
 export default ProgressBarChart;
+
 
 // Types
 interface ProgressBarChartProp {

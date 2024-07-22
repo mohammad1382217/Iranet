@@ -1,8 +1,8 @@
-import React, { useEffect } from "react";
-import { IconButton, Drawer } from "@material-tailwind/react";
 import { HiMenu } from "react-icons/hi";
-import { FaRegBell } from "react-icons/fa";
-import { ProfileMenu } from "./ProfileMenu";
+import React from "react";
+const IconButton = React.lazy(()=> import("@material-tailwind/react/components/IconButton/index"));
+const Drawer = React.lazy(()=> import("@material-tailwind/react/components/Drawer/index"));
+
 import {
   appSlice,
   selectOpenLeft,
@@ -11,17 +11,17 @@ import {
   useSelector,
 } from "../../lib/redux";
 
-export const Header: React.FC<HeaderProps> = ({
+const Header: React.FC<HeaderProps> = ({
   sidebarDrawer,
   NotificationDrawer,
   leftSectionHeader,
 }) => {
   const dispatch = useDispatch();
   const [time, setTime] = React.useState(new Date());
-  
+
   const options = { timeZone: "Asia/Tehran", hour12: false };
   const iranianTime = time.toLocaleTimeString("en-US", options);
-  useEffect(() => {
+  React.useEffect(() => {
     const interval = setInterval(() => {
       setTime(new Date());
     }, 1000);
@@ -36,8 +36,8 @@ export const Header: React.FC<HeaderProps> = ({
   const closeDrawerLeft = () => dispatch(appSlice.actions.setOpenLeft(false));
   return (
     <>
-      <div className="flex lg:-mt-3 items-center flex-row w-full justify-between sm:text-[0.625rem] md:px-0 lg:!pr-0 px-1 sm:!px-1 ">
-        <div className="z-40 lg:hidden">
+      <div className="flex lg-max:-mt-3 items-center flex-row w-full justify-between sm-max:text-[0.625rem] md-max:px-0 lg-max:!pr-0 px-1 sm-max:!px-1 select-none">
+        <div className="z-40 lg-max:hidden">
           <div className="flex items-center justify-center gap-2">
             <h2> تاریخ و ساعت : </h2>
             <span>{new Intl.DateTimeFormat("fa-IR").format()}</span>
@@ -45,10 +45,10 @@ export const Header: React.FC<HeaderProps> = ({
             <span>{iranianTime}</span>
           </div>
         </div>
-        <div className="hidden lg:block">
+        <div className="hidden lg-max:block">
           <IconButton
             onClick={() => openDrawerRight()}
-            className="bg-transparent shadow-none hover:shadow-none md:w-9 md:h-9 z-40"
+            className="bg-transparent shadow-none hover:shadow-none md-max:w-9 md-max:h-9 z-40"
           >
             <HiMenu className="w-6 h-6 text-black" />
           </IconButton>
@@ -63,9 +63,7 @@ export const Header: React.FC<HeaderProps> = ({
         onClose={() => closeDrawerRight()}
         className="w-60"
       >
-        <div className="mb-6 flex items-center">
-          {sidebarDrawer}
-        </div>
+        <div className="mb-6 flex items-center">{sidebarDrawer}</div>
       </Drawer>
       <Drawer
         placement="left"
@@ -78,6 +76,8 @@ export const Header: React.FC<HeaderProps> = ({
     </>
   );
 };
+
+export default Header;
 
 // Types
 interface HeaderProps {

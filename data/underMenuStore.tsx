@@ -1,20 +1,18 @@
-import { Chip } from "@material-tailwind/react";
+import Chip from "@material-tailwind/react/components/Chip/index";
 import {
   FiGrid,
   FiUsers,
   FiMessageSquare,
-  FiCalendar,
   FiMail,
-  FiSend,
   FiBarChart2,
   FiTrendingUp,
 } from "react-icons/fi";
-import { LuBook, LuThumbsUp, LuGift } from "react-icons/lu";
+import { LuThumbsUp, LuGift } from "react-icons/lu";
 
-export const underMenu = [
+export const underMenuStore = [
   {
     id: 1,
-    title: <p>داشبورد</p>,
+    title: <p lang="fa" role="text">داشبورد</p>,
     icon: <FiGrid className="w-4 h-4" />,
     redirect: "/store/dashboard",
     color: "#00503A",
@@ -22,7 +20,7 @@ export const underMenu = [
   },
   {
     id: 2,
-    title: <p>گروه ها</p>,
+    title: <p lang="fa" role="text">گروه ها</p>,
     icon: <FiUsers className="w-4 h-4" />,
     redirect: "/store/groups",
     color: "#00503A",
@@ -30,15 +28,7 @@ export const underMenu = [
   },
   {
     id: 3,
-    title: <p>دفترچه ها</p>,
-    icon: <LuBook className="w-4 h-4" />,
-    redirect: "/store/notes",
-    color: "#00503A",
-    backgroundColor: "#DFF8F2",
-  },
-  {
-    id: 4,
-    title: <p>ارسال پیامک</p>,
+    title: <p lang="fa" role="text">ارسال پیامک</p>,
     icon: <FiMessageSquare className="w-4 h-4" />,
     redirect: "/store/SendSms",
     color: "#00503A",
@@ -46,34 +36,26 @@ export const underMenu = [
   },
   {
     id: 5,
-    title: <p>پیام های مناسبتی</p>,
-    icon: <FiCalendar className="w-4 h-4" />,
-    redirect: "/store/occasionalMessage",
-    color: "#00503A",
-    backgroundColor: "#DFF8F2",
-  },
-  {
-    id: 6,
-    title: <p>نظرسنجی ها</p>,
+    title: <p lang="fa" role="text">نظرسنجی و مسابقه</p>,
     icon: <LuThumbsUp className="w-4 h-4" />,
     redirect: "/store/survey",
     color: "#00503A",
     backgroundColor: "#DFF8F2",
   },
   {
-    id: 7,
-    title: <p>قرعه کشی</p>,
+    id: 6,
+    title: <p lang="fa" role="text">قرعه کشی</p>,
     icon: <LuGift className="w-4 h-4" />,
     redirect: "/store/lottery",
     color: "#00503A",
     backgroundColor: "#DFF8F2",
   },
   {
-    id: 8,
+    id: 7,
     title: (
-      <div className="w-full h-10 !p-0 flex justify-between items-center rounded-lg">
+      <div className="w-full h-10 !p-0 flex justify-between items-center rounded-lg select-none">
         <div className="flex flex-row gap-2.5 items-center justify-start !p-0">
-          <p>تیکت ها</p>
+          <p lang="fa" role="text">تیکت ها</p>
         </div>
         <Chip
           value="14"
@@ -90,24 +72,16 @@ export const underMenu = [
     backgroundColor: "#DFF8F2",
   },
   {
-    id: 9,
-    title: <p>گزارشات ارسال</p>,
-    icon: <FiSend className="w-4 h-4" />,
-    redirect: "/store/sendReports",
-    color: "#00503A",
-    backgroundColor: "#DFF8F2",
-  },
-  {
-    id: 10,
-    title: <p>گزارشات مالی</p>,
+    id: 8,
+    title: <p lang="fa" role="text">گزارشات مالی</p>,
     icon: <FiBarChart2 className="w-4 h-4" />,
     redirect: "/store/financialReports",
     color: "#00503A",
     backgroundColor: "#DFF8F2",
   },
   {
-    id: 11,
-    title: <p>شارژ حساب</p>,
+    id: 9,
+    title: <p lang="fa" role="text">شارژ حساب</p>,
     icon: <FiTrendingUp className="w-4 h-4" />,
     redirect: "/store/chargeAccount",
     color: "#00503A",

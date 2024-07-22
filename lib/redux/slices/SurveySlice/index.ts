@@ -1,3 +1,4 @@
-export * from './Survey'
-export * from './thunks'
+export * from './SurveySlice'
+export * from './thunk'
 export * from './selectors'
+

@@ -23,9 +23,7 @@ const initialState: userNoteSliceState = {
       phoneNumber:"093932373968",
     },
   ],
-  editingKey: "",
-  searchText: "",
-  searchedColumn: "",
+  editingKeyUserNotes: "",
   status: 'idle',
 }
 
@@ -37,14 +35,8 @@ export const userNoteSlice = createSlice({
     setNewData: (state ,actions : PayloadAction<userNoteData[]>) => {
       state.userNoteData = actions.payload;
     },
-    setEditingKey: (state ,actions : PayloadAction<string>) => {
-      state.editingKey = actions.payload;
-    },
-    setSearchText: (state ,actions : PayloadAction<string>) => {
-      state.searchText = actions.payload;
-    },
-    setSearchedColumn: (state ,actions : PayloadAction<string>) => {
-      state.searchedColumn = actions.payload;
+    setEditingKeyUserNotes: (state ,actions : PayloadAction<string>) => {
+      state.editingKeyUserNotes = actions.payload;
     },
   },
 })
@@ -52,11 +44,10 @@ export const userNoteSlice = createSlice({
 /* Types */
 export interface userNoteSliceState {
   userNoteData: userNoteData[],
-  editingKey: string,
-  searchText : string,
-  searchedColumn : string,
+  editingKeyUserNotes: string,
   status: 'idle' | 'loading' | 'failed'
 }
+
 export interface userNoteData {
   key: string,
   firstName: string,
@@ -65,4 +56,3 @@ export interface userNoteData {
   job: string,
   phoneNumber: string,
 }
-

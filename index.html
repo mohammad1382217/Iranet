@@ -1,13 +1,62 @@
-<!doctype html>
-<html lang="fa-IR" dir="rtl">
+<!DOCTYPE html>
+<html class="w-screen h-screen min-h-screen" lang="fa" dir="rtl" xml:lang="fa">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/src/app/icon.ico" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>ایرانت</title>
+    <meta name="description" content="My Awesome App description" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>management customers</title>
+
+    <!-- Preconnect -->
+    <link rel="preconnect" href="https://backend-irannet.liara.run/" />
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://front-irannet.liara.run/" />
+    
+    <!-- Preload font -->
+    <link rel="preload" href="/font/Estedad-FD-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    
+    <!-- Apple Touch Icon -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
+    <link rel="icon" href="/favicon-32x32.png" type="image/png" sizes="32x32" />
+    <link rel="icon" href="/favicon-16x16.png" type="image/png" sizes="16x16" />
+    
+    <!-- Manifest -->
+    <link rel="manifest" href="/site.webmanifest" />
+    
+    <!-- Theme Colors -->
+    <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
+    
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+      {
+        "@context": "http://schema.org",
+        "@type": "WebSite",
+        "url": "https://backend-irannet.liara.run/",
+        "name": "ایرانت",
+      }
+    </script>
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="ایرانت - بهترین خدمات وب" />
+    <meta property="og:description" content="ایرانت، ارائه‌دهنده بهترین خدمات وب و اپلیکیشن." />
+    <meta property="og:image" content="https://backend-irannet.liara.run/og-image.jpg" />
+    <meta property="og:url" content="https://backend-irannet.liara.run/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="fa_IR" />
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="ایرانت - بهترین خدمات وب" />
+    <meta name="twitter:description" content="ایرانت، ارائه‌دهنده بهترین خدمات وب و اپلیکیشن." />
+    <meta name="twitter:image" content="https://backend-irannet.liara.run/images/og-image.jpg" />
   </head>
-  <body>
-    <div id="root"></div>
+  <body class="w-screen h-screen min-h-screen overflow-y-auto overflow-x-hidden">
+    <div id="root" role="main"></div>
     <script type="module" src="/app/page.tsx"></script>
   </body>
 </html>

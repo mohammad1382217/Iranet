@@ -16,6 +16,6 @@
     "jsx": "preserve",
     "incremental": true,
   },
-  "include": ["vite-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "include": ["vite-env.d.ts", "**/*.ts", "**/*.tsx", "lib/redux/slices/ListofGroupsAdminSlice/fetchListofGroupsAdmints"],
   "exclude": ["node_modules"]
 }

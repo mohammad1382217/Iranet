@@ -21,8 +21,6 @@ const initialState: tableInputNotesSliceState = {
 
   ],
   editingKeyTable: "",
-  searchText: "",
-  searchedColumn: "",
   add_title: "",
   add_kind: "",
   add_limitcharacter :null,
@@ -36,12 +34,6 @@ export const tableInputNotesSlice = createSlice({
   reducers: {
     setEditingKeyTable: (state ,actions : PayloadAction<string>) => {
       state.editingKeyTable = actions.payload;
-    },
-    setSearchText: (state ,actions : PayloadAction<string>) => {
-      state.searchText = actions.payload;
-    },
-    setSearchedColumn: (state ,actions : PayloadAction<string>) => {
-      state.searchedColumn = actions.payload;
     },
     setAddTitle:(state ,actions : PayloadAction<string>) => {
       state.add_title = actions.payload;
@@ -61,8 +53,6 @@ export const tableInputNotesSlice = createSlice({
 /* Types */
 export interface tableInputNotesSliceState {
   dataTable: dataTable[],
-  searchText : string,
-  searchedColumn: string,
   editingKeyTable: string,
   add_title: string,
   add_kind: string,

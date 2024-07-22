@@ -1,273 +1,227 @@
-import React, { useRef } from "react";
-import Button_component from "../../../components/Button";
-import {
-  Input,
-  Tag,
-  Space,
-  Table,
-  Button,
-  ConfigProvider,
-  InputRef,
-} from "antd";
-import fa_IR from "antd/locale/fa_IR";
-import { NavLink } from "react-router-dom";
-import { SearchOutlined } from "@ant-design/icons";
-import { FaRegTrashAlt } from "react-icons/fa";
-import { IoIosChatboxes } from "react-icons/io";
-
-import {
-  ticketsSlice,
-  selectticketsData,
-  selectticketsSearchText,
-  selectticketsSearchedColumn,
-  useSelector,
-  useDispatch,
-} from "../../../../lib/redux";
-import Highlighter from "react-highlight-words";
+import React from "react";
+import moment from "moment-jalaali";
+import { Link } from "react-router-dom";
 import "../../../components/TableInputNote/TableInputNote.scss";
-import { ColumnType } from "antd/es/table";
-import { FilterConfirmProps } from "antd/es/table/interface";
-import { ColumnsType } from "antd/lib/table";
+import {
+  selectStatusTicketsDataUsers,
+  selectTicketsDataUsers,
+  ticketsUsersDataType,
+  useSelector,
+  useDispatch
+} from "../../../../lib/redux";
+import HeaderWithButton from "../../../components/HeaderWithButton";
+import CustomTable, { CustomColumnType } from "../../../components/Table";
+import { fetchUsersTicket } from "../../../../lib/redux/slices/ticketsSlice/fetchUsersTicket";
 
-const Tickets: React.FC = () => {
+const Spin = React.lazy(() => import("antd/es/spin/index"));;
+const Button = React.lazy(() => import("antd/es/button/index"));
+const Tag = React.lazy(() => import("antd/es/tag/index"));
+const Badge = React.lazy(() => import("antd/es/badge/index"));
+const ButtonComponent = React.lazy(() => import("../../../components/Button"));
+
+const StoresTickets: React.FC = () => {
+  const status = useSelector(selectStatusTicketsDataUsers);
   const dispatch = useDispatch();
-  const tableData = useSelector(selectticketsData);
-  const searchTextValue = useSelector(selectticketsSearchText);
-  const searchedColumn = useSelector(selectticketsSearchedColumn);
-  const searchInput = useRef<InputRef>(null);
+  const tableData = useSelector(selectTicketsDataUsers);
 
-  const handleSearch = (
-    selectedKeys: string[],
-    confirm: (param?: FilterConfirmProps) => void,
-    dataIndex: DataIndex
-  ) => {
-    confirm();
-    dispatch(ticketsSlice.actions.setSearchText(selectedKeys[0]));
-    dispatch(ticketsSlice.actions.setSearchedColumn(dataIndex));
-  };
-
-  const handleReset = (clearFilters: () => void) => {
-    clearFilters();
-    dispatch(ticketsSlice.actions.setSearchText(""));
-  };
-
-  const getColumnSearch = (
-    dataIndex: DataIndex,
-    name: string
-  ): ColumnType<DataType> => ({
-    filterDropdown: ({
-      setSelectedKeys,
-      selectedKeys,
-      confirm,
-      clearFilters,
-    }) => (
-      <div
-        style={{
-          padding: 8,
-          width: 250,
-        }}
-        onKeyDown={(e) => e.stopPropagation()}
-      >
-        <Input
-          ref={searchInput}
-          className="font-thin font-[Estedad-FD]"
-          placeholder={`جستجو در ${name}`}
-          value={selectedKeys[0]}
-          onChange={(e) =>
-            setSelectedKeys(e.target.value ? [e.target.value] : [])
-          }
-          onPressEnter={() =>
-            handleSearch(selectedKeys as string[], confirm, dataIndex)
-          }
-          style={{
-            marginBottom: 8,
-            display: "block",
-          }}
-        />
-        <Space className="w-full flex flex-row justify-between gap-2">
-          <Button_component
-            Type="submit"
-            onClick={() => clearFilters && handleReset(clearFilters)}
-            ButtonClass="!w-[105px] !h-[28px] border-secondary border-2 bg-[#FFFFFF] bg-gray-50 text-xs font-bold px-2.5 py-1.5 flex justify-between items-center gap-2"
-          >
-            <span className="text-black text-[10px]">پاک سازی متن</span>
-            <FaRegTrashAlt color="black" />
-          </Button_component>
-          <Button_component
-            onClick={() =>
-              handleSearch(selectedKeys as string[], confirm, dataIndex)
-            }
-            ButtonClass="!w-[123px] !h-[28px] bg-gray-50 text-xs font-bold px-2.5 py-1.5 flex justify-center items-center bg-secondary gap-2"
-          >
-            <span className="text-[10px]">جستجو</span>
-            <SearchOutlined className="w-4 h-4 leading-normal" />
-          </Button_component>
-        </Space>
-      </div>
-    ),
-    filterIcon: (filtered: boolean) => (
-      <SearchOutlined
-        style={{
-          color: filtered ? "#1677ff" : undefined,
-        }}
-      />
-    ),
-    onFilter: (value: any, record) =>
-      record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
-    onFilterDropdownOpenChange: (visible: boolean) => {
-      if (visible) {
-        setTimeout(() => searchInput.current?.select(), 100);
-      }
-    },
-    render: (text: string) =>
-      searchedColumn === dataIndex ? (
-        <Highlighter
-          highlightStyle={{
-            backgroundColor: "#DFF8F2",
-            padding: 0,
-          }}
-          searchWords={[searchTextValue]}
-          autoEscape
-          textToHighlight={text ? text.toString() : ""}
-        />
-      ) : (
-        text
-      ),
-  });
-
-  const columns_tickets = [
-    {
-      title: "موضوع",
-      dataIndex: "ticketname",
-      key: "ticketname",
-      width: "20%",
-      ...getColumnSearch("ticketname", "موضوع"),
-      // render: (ticketname: string) => (
-      render:(_: any, record: DataType) => (
-        <div className="flex flex-row ">
-         
-          <p
-          className={
-            record.Condition == "پاسخ داده شده"
-              ? "text-[#630303]"
-              : ""
-          }
-          // className={}
-            // className='text-red-200'
-            // className={record.Condition}
-          //  className={
-          //   record.Condition === "پاسخ داده شده"
-          //   ? 'text-red-200'
-          // }
-          >{record.Condition}
-          </p>
-          {
-             record.Condition == "پاسخ داده شده"
-             ? <IoIosChatboxes className='mr-2' color='#FD6E6E' size={18} /> : ""
-          }
-        </div>
-      ),
-    },
-
-    {
-      title: "تاریخ",
-      dataIndex: "date",
-      key: "date",
-      align: "center",
-      sorter: (a: DataType, b: DataType) => a.date.localeCompare(b.date),
-    },
-
+  React.useEffect(() => {
+    dispatch(fetchUsersTicket());
+    console.log(tableData);
+  }, []);
+  const columns_tickets: CustomColumnType<ticketsUsersDataType>[] = [
     {
       title: "کد شناسه",
-      dataIndex: "recognizecode",
+      dataIndex: "code",
       align: "center",
-      key: "recognizecode",
-      width: "25%",
-      ...getColumnSearch("recognizecode", "کد شناسه"),
+      key: "code",
+      searchProps: true,
+      render: (code: number) => (
+        <Tag
+          key={code}
+          color="#1890FF"
+          className="font-normal mx-auto  rounded-lg text-xs text-[#FFFFFF]"
+        >
+          {code}
+        </Tag>
+      ),
+    },
+    {
+      title: "موضوع",
+      dataIndex: "title",
+      key: "title",
+      searchProps: true,
+    },
+    {
+      title: "تاریخ",
+      dataIndex: "created_at",
+      key: "created_at",
+      DateRangeProps: true,
+      align: "center",
+      sorter: (a: ticketsUsersDataType, b: ticketsUsersDataType) =>
+        -a.created_at.localeCompare(b.created_at),
+      render: (text) => <>{moment(text).format(
+        "jYYYY/jMM/jDD - HH:mm"
+      )}</>,
+    },
+    {
+      title: "دپارتمان",
+      dataIndex: "department",
+      key: "department",
+      align: "center",
+      filters: [
+        {
+          text: "مالی",
+          value: "F",
+        },
+        {
+          text: "مدیریت",
+          value: "M",
+        },
+        {
+          text: "ارسال پیامک",
+          value: "SMSM",
+        },
+        {
+          text: "فنی",
+          value: "T",
+        },
+        {
+          text: "طراحی و تولید",
+          value: "DAP",
+        },
+      ],
+      onFilter: (value: React.Key | boolean, record: ticketsUsersDataType) =>
+        record.department === value,
+      render: (department: string) => {
+        if (department === "F") {
+          return "مالی";
+        } else if (department === "M") {
+          return "مدیریت";
+        } else if (department === "SSMS") {
+          return "ارسال پیامک";
+        } else if (department === "T") {
+          return "فنی";
+        } else if (department === "DAP") {
+          return "طراحی و تولید";
+        }
+      },
     },
     {
       title: "وضعیت",
-      dataIndex: "Condition",
-      key: "Condition",
+      dataIndex: "status",
+      key: "status",
       align: "center",
-      width: "20%",
-      ...getColumnSearch("Condition", "وضعیت"),
-      render: (Condition: string[]) =>
-        Condition.map((Condition, index) => (
-          <Tag
-            key={index}
-            color={
-              Condition === "پاسخ داده شده"
-                ? "green"
-                : Condition === "پاسخ داده شده و در حال بررسی"
-                ? "blue"
-                : Condition === "بسته شده"
-                ? "red"
-                : ""
+      filters: [
+        {
+          text: "در انتظار پاسخ",
+          value: "P",
+        },
+        {
+          text: "پاسخ داده شده",
+          value: "A",
+        },
+        {
+          text: "پاسخ داده شده و در حال بررسی",
+          value: "AUR",
+        },
+        {
+          text: "در حال بررسی",
+          value: "R",
+        },
+        {
+          text: "بسته شده",
+          value: "C",
+        },
+      ],
+      onFilter: (value: React.Key | boolean, record: ticketsUsersDataType) =>
+        record.status === value,
+      render: (status: string) => (
+        <span>
+          {[status].map((tag) => {
+            let name: string;
+            let color: string;
+            if (tag === "AUR") {
+              color = "blue";
+              name = "پاسخ داده شده و در حال بررسی";
+            } else if (tag === "P") {
+              color = "orange";
+              name = "در انتظار پاسخ";
+            } else if (tag === "A") {
+              color = "green";
+              name = "پاسخ داده شده";
+            } else if (tag === "C") {
+              color = "#D9D9D9";
+              name = "بسته شده";
+            } else {
+              color = "#FADB14";
+              name = "در حال برسی";
             }
-          >
-            {Condition}
-          </Tag>
-        )),
+            return (
+              <p
+                lang="fa"
+                role="text"
+                key={tag}
+                className="flex flex-row-reverse justify-center items-baseline"
+              >
+                {name}
+                <Badge className="ml-1" size="default" color={color}></Badge>
+              </p>
+            );
+          })}
+        </span>
+      ),
     },
     {
       title: "پاسخ ادمین",
       align: "center",
-      dataIndex: "key",
-      key: "key",
-      render: (action: number) => (
-        <Space>
-          <NavLink to={`/store/tickets/viewTicket/${action}`}>
-            <Button type="link">مشاهدۀ پاسخ</Button>
-          </NavLink>
-        </Space>
+      dataIndex: "id",
+      key: "id",
+      render: (id: number) => (
+        <Link to={`/store/Tickets/viewTicket/${id}`}>
+          <Button className="p-0 text-[#039BE5]" color="#039BE5" type="link">
+            مشاهدۀ
+          </Button>
+        </Link>
       ),
     },
   ];
 
+  const getRowClassName = (record: ticketsUsersDataType) => {
+    return record.status === "A" ? "blue-row" : "";
+  };
+
   return (
     <>
-      {/* <Header /> */}
-      <div className="flex flex-col items-center p-10 sm:!p-5 xl:w-full h-full">
-        <div className=" w-full h-16 p-3 bg-cover rounded-lg  hover:cursor-pointer bg-[#FAFAFA] flex justify-between items-center">
-          <p className="text-2xl font-semibold sm:text-sm text-[#151515]">
-            لیست تیکت های ارسالی
-          </p>
-          <NavLink to="/store/tickets/addTicket">
-            <Button_component
-              children={
-                <div className="flex justify-center flex-row-reverse items-center">
+      <div className="flex flex-col items-center p-10 sm-max:!p-5 xl-max:w-full h-full">
+        <HeaderWithButton
+          HeaderTitle={"لیست تیکت های ارسالی"}
+          Button={
+            <Link to="/users/tickets/addTicket">
+              <ButtonComponent ButtonClass="bg-secondary text-xs font-bold sm-max:p-3 h-11 flex justify-center items-center">
+                <div className="flex justify-center flex-row-reverse items-center sm-max:text-[0.625rem]">
                   ثبت تیکت جدید<div className="text-xl p-0  ml-3">+</div>
                 </div>
-              }
-              ButtonClass="bg-[#2DCEA2] text-xs font-bold h-11 flex justify-center items-center"
-            />
-          </NavLink>
-        </div>
-        <div className="mb-5 w-full p-0 bg-cover rounded-lg md:mb-3 hover:cursor-pointer">
-          <ConfigProvider locale={fa_IR}>
-            <Table
-              className="mt-5"
+              </ButtonComponent>
+            </Link>
+          }
+        />
+        <div className="mt-10 mb-5 w-full p-0 bg-cover rounded-lg md-max:mb-3 hover:cursor-pointer">
+          <Spin spinning={status === "loading" ? true : false}>
+            <CustomTable
               bordered
+              rowClassName={getRowClassName}
+              size="large"
               dataSource={tableData}
-              columns={columns_tickets as ColumnsType<DataType>}
+              columns={columns_tickets}
+              theme={"secondary"}
             />
-          </ConfigProvider>
+          </Spin>
         </div>
       </div>
     </>
   );
 };
 
-export default Tickets;
+export default StoresTickets;
 
 // Types
-interface DataType {
-  key: React.Key;
-  ticketname: string;
-  recognizecode: number;
-  date: string;
-  Condition: string[];
-}
-
-type DataIndex = keyof DataType;

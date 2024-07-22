@@ -1,4 +1,4 @@
-# Iranet
+# iranet-front
 
 
 **Redux Toolkit TypeScript**
@@ -32,7 +32,7 @@ react-ts
 ```
 **select name Project**
 ```bash
-Iranet
+customer_management_system
 ```
 **Run Project**
 ```bash

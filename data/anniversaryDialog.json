@@ -2,29 +2,21 @@
   "data": [
     {
       "key": "1",
-      "firstName": "محمد",
-      "lastName": "محمدی",
       "occasion": "تولد",
       "phoneNumber": "09123456789"
     },
     {
       "key": "2",
-      "firstName": "علی",
-      "lastName": "علوی",
       "occasion": "سالگرد ازدواج",
       "phoneNumber": "09123456789"
     },
     {
       "key": "3",
-      "firstName": "حسن",
-      "lastName": "حسنی",
       "occasion": "تولد",
       "phoneNumber": "09123456789"
     },
     {
       "key": "4",
-      "firstName": "جواد",
-      "lastName": "جوادی",
       "occasion": "تولد",
       "phoneNumber": "09123456789"
     }

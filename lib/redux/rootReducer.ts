@@ -1,4 +1,5 @@
 /* Instruments */
+import { combineReducers } from "@reduxjs/toolkit";
 import {
   dashboardSlice,
   appSlice,
@@ -7,24 +8,40 @@ import {
   tableInputNotesSlice,
   userNoteSlice,
   occasionalmessageSlice,
+  NotificationManagementSlice,
   ticketsSlice,
   sendReportSlice,
   SurveySlice,
   loginSlice,
   groupsSlice,
+  UserManagementSlice,
+  StoreManagementSlice,
+  ListofGroupsAdminSlice,
+  SettingSlice,
+  ViewSendReportSlice,
+  lotterySlice,
 } from "./slices";
+import { AuthenticationSlice } from "./slices/AuthenticationSlice";
 
-export const reducer = {
-  dashboard: dashboardSlice.reducer,
+export const reducer = combineReducers({
   anniversaryDialog: anniversaryDialogSlice.reducer,
+  app: appSlice.reducer,
+  dashboard: dashboardSlice.reducer,
   groups: groupsSlice.reducer,
+  login: loginSlice.reducer,
+  lottery: lotterySlice.reducer,
+  StoreManagement: StoreManagementSlice.reducer,
+  Setting: SettingSlice.reducer,
   notes: notesSlice.reducer,
-  tableInputNote: tableInputNotesSlice.reducer,
-  occasionalmessage: occasionalmessageSlice.reducer,
-  userNote: userNoteSlice.reducer,
-  tickets: ticketsSlice.reducer,
+  occasionalMessage: occasionalmessageSlice.reducer,
+  NotificationManagement: NotificationManagementSlice.reducer,
   sendReport: sendReportSlice.reducer,
   Survey: SurveySlice.reducer,
-  app: appSlice.reducer,
-  login: loginSlice.reducer,
-};
+  tableInputNotes: tableInputNotesSlice.reducer,
+  userNote: userNoteSlice.reducer,
+  tickets: ticketsSlice.reducer,
+  Authentication: AuthenticationSlice.reducer,
+  UserManagement: UserManagementSlice.reducer,
+  ListofGroupsAdmin: ListofGroupsAdminSlice.reducer,
+  ViewSendReport:ViewSendReportSlice.reducer,
+});

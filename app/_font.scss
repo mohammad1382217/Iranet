@@ -1,6 +1,7 @@
 @font-face {
     font-family: 'Estedad-FD';
-    src: url('./assets/fonts/Estedad-FD-Regular.woff2') format('woff2');
+    src: url("/font/Estedad-FD-Regular.woff2") format('woff2');
+    font-display: optional;
 }
 
 $font-family-Estedad-FD:"Estedad-FD";

@@ -1,57 +1,121 @@
-import "./globals.scss";
-import React from "react";
+import React, { lazy, Suspense } from "react";
 import ReactDOM from "react-dom/client";
+import "./globals.scss";
 import { Provider } from "react-redux";
 import { reduxStore } from "../lib/redux";
-import RootStoreLayout from "./(store)/layout";
-import Notes from "./(store)/store/Notes/page";
-import Login from "./Login/page";
-import Survey from "./(store)/store/Survey/page";
-import Groups from "./(store)/store/Groups/page";
-import Lottery from "./(store)/store/Lottery/page";
-import Account from "./Account/page";
-import SendSms from "./(store)/store/Sendsms/page";
-import Tickets from "./(store)/store/Tickets/page";
-import Register from "./Register/page";
-import AddGroup from "./(store)/store/Groups/AddGroup/page";
-import Dashboard from "./(store)/store/Dashboard/page";
-import AddSurvey from "./(store)/store/Survey/AddSurvey/page";
-import ViewGroup from "./(store)/store/Groups/ViewGroup/[id]/page";
-import ViewSurvey from "./(store)/store/Survey/ViewSurvey/[id]/page";
-import ViewOccasionalMessage from "./(store)/store/OccasionalMessage/ViewOccasionalMessage/[id]/page";
-import ViewTicket from "./store/Tickets/ViewTickets/[id]/page";
-import AddTickets from "./(store)/store/Tickets/AddTickets/page";
-import AddLottery from "./(store)/store/Lottery/AddLottery/page";
-import SendReports from "./(store)/store/SendReports/page";
-import AddNotePhone from "./(store)/store/Notes/AddNotePhone/page";
-import ChargeAccount from "./(store)/store/ChargeAccount/page";
-import DirectPayment from "./(store)/store/DirectPayment/page";
-import LotteryResult from "./(store)/store/Lottery/LotteryResult/page";
-import FinancialReports from "./(store)/store/FinancialReports/page";
-import OccasionalMessage from "./(store)/store/OccasionalMessage/page";
-import SupplementaryForm from "./SupplementaryForm/page";
-import AddOccasionalMesssage from "./(store)/store/OccasionalMessage/AddOccasionalMessage/page";
 import {
   Navigate,
   RouterProvider,
   createBrowserRouter,
 } from "react-router-dom";
-import RootLayout from "./layout";
-import ViewNotePhone from "./(store)/store/Notes/ViewNotePhone/[id]/page";
-import ShowLotteryWinners from "./(store)/store/Lottery/ShowLotteryWinners/page";
-import DepositToTheAccount from "./(store)/store/DepositToTheAccount/page";
-import RootAdminLayout from "./(admin)/layout";
-import AdminDashboard from "./(admin)/admin/Dashboard/page";
-import Setting from "./(admin)/admin/Setting/page";
-import UserManagement from "./(admin)/admin/UserManagement/page";
-import ManagingTexts from "./(admin)/admin/ManagingTexts/page";
-import NotificationManagement from "./(admin)/admin/NotificationManagement/page";
-import SmsSendingPanel from "./(admin)/admin/SmsSendingPanel/page";
-import AdminTickets from "./(admin)/admin/Tickets/page";
-import ListOfPhonebooks from "./(admin)/admin/ListOfPhonebooks/page";
-import ListOfPolls from "./(admin)/admin/ListOfPolls/page";
-import LotteryList from "./(admin)/admin/LotteryList/page";
-import ListOfFinancialReports from "./(admin)/admin/ListOfFinancialReports/page";
+
+const Login = lazy(() => import("./Login/page"));
+const RootLayout = lazy(() => import("./layout"));
+const RootStoreLayout = lazy(() => import("./(store)/layout"));
+const RootAdminLayout = lazy(() => import("./(admin)/layout"));
+const RootusersLayout = lazy(() => import("./(users)/layout"));
+const Dashboard = lazy(() => import("./(store)/store/Dashboard/page"));
+const DirectPayment = lazy(() => import("./(store)/store/DirectPayment/page"));
+const DepositToTheAccount = lazy(
+  () => import("./(store)/store/DepositToTheAccount/page")
+);
+const StoreManagement = lazy(
+  () => import("./(admin)/admin/StoreManagement/page")
+);
+const ViewStore = lazy(
+  () => import("./(admin)/admin/StoreManagement/ViewStore/[id]/page")
+);
+const ViewTicketUsers = lazy(
+  () => import("./(users)/users/Tickets/ViewTickets/[id]/page")
+);
+const StoresTickets = lazy(() => import("./(store)/store/Tickets/page"));
+const StoresAddTickets = lazy(
+  () => import("./(store)/store/Tickets/AddTickets/page")
+);
+const ViewTicketStores = lazy(
+  () => import("./(store)/store/Tickets/ViewTickets/[id]/page")
+);
+const FinancialReports = lazy(
+  () => import("./(store)/store/FinancialReports/page")
+);
+const AddSurvey = lazy(() => import("./(store)/store/Survey/AddSurvey/page"));
+const Survey = lazy(() => import("./(store)/store/Survey/page"));
+const Groups = lazy(() => import("./(store)/store/Groups/page"));
+const Lottery = lazy(() => import("./(store)/store/Lottery/page"));
+const SendSms = lazy(() => import("./(store)/store/Sendsms/page"));
+const ViewSurvey = lazy(
+  () => import("./(store)/store/Survey/ViewSurvey/[id]/page")
+);
+const ShowLotteryWinners = lazy(
+  () => import("./(store)/store/Lottery/ShowLotteryWinners/page")
+);
+const LotteryResult = lazy(
+  () => import("./(store)/store/Lottery/LotteryResult/page")
+);
+const Account = lazy(() => import("./(store)/store/Account/page"));
+const Register = lazy(() => import("./Register/page"));
+const OtpValid = lazy(() => import("./otp-valid/page"));
+const Page404 = lazy(() => import("./[...not-found]/page"));
+const SurveyView = lazy(() => import("./store/SurveyView/page"));
+const Setting = lazy(() => import("./(admin)/admin/Setting/page"));
+const AddAudience = lazy(() => import("./store/AddAudience/page"));
+const FailedPayment = lazy(() => import("./store/FailedPayment/page"));
+const PasswordRecovery = lazy(() => import("./PasswordRecovery/page"));
+const AdminTickets = lazy(() => import("./(admin)/admin/Tickets/page"));
+const UsersTickets = lazy(() => import("./(users)/users/Tickets/page"));
+const ViewSmsDeTails = lazy(() => import("./admin/viewSmsDetails/page"));
+const ListOfPolls = lazy(() => import("./(admin)/admin/ListOfPolls/page"));
+const LotteryList = lazy(() => import("./(admin)/admin/LotteryList/page"));
+const ViewTicketAdmin = lazy(() => import("./admin/ViewTickets/[id]/page"));
+const AdminDashboard = lazy(() => import("./(admin)/admin/Dashboard/page"));
+const UsersDashboard = lazy(() => import("./(users)/users/Dashboard/page"));
+const NewPassword = lazy(() => import("./PasswordRecovery/NewPassword/page"));
+const SuccessfulPayment = lazy(() => import("./store/SuccessfulPayment/page"));
+const Registeration = lazy(() => import("./(users)/users/Registeration/page"));
+const SurveyResult = lazy(() => import("./store/SurveyView/SurveyResult/page"));
+const UserManagement = lazy(
+  () => import("./(admin)/admin/UserManagement/page")
+);
+const Authentication = lazy(
+  () => import("./(users)/users/Authentication/page")
+);
+const SmsSendingPanel = lazy(
+  () => import("./(admin)/admin/SmsSendingPanel/page")
+);
+const ViewSmsDeTailsReport = lazy(
+  () => import("./admin/ViewSmsDetailsReport/page")
+);
+const ListOfGroups = lazy(() => import("./(admin)/admin/ListOfGroups/page"));
+const UsersAddTickets = lazy(
+  () => import("./(users)/users/Tickets/AddTickets/page")
+);
+const ViewUser = lazy(
+  () => import("./(admin)/admin/UserManagement/ViewUser/[id]/page")
+);
+const LotteryWinners = lazy(
+  () => import("./(admin)/admin/LotteryList/LotteryWinners/page")
+);
+const ViewSendReport = lazy(
+  () => import("./admin/UserManagement/ViewSendReport/[id]/page")
+);
+const AddOrEditSurvey = lazy(
+  () => import("./(admin)/admin/ListOfPolls/AddOrEditSurvey/page")
+);
+const NotificationManagement = lazy(
+  () => import("./(admin)/admin/NotificationManagement/page")
+);
+const ListOfFinancialReports = lazy(
+  () => import("./(admin)/admin/ListOfFinancialReports/page")
+);
+const ViewGroup = lazy(
+  () => import("./(admin)/admin/ListOfGroups/ViewGroup/[id]/page")
+);
+const SystemDeposit = lazy(
+  () => import("./(admin)/admin/ListOfFinancialReports/systemDeposit/page")
+);
+const ViewListOfFinancialReport = lazy(
+  () => import("./admin/UserManagement/ViewListOfFinancialReports/[id]/page")
+);
 
 const router = createBrowserRouter([
   {
@@ -64,24 +128,141 @@ const router = createBrowserRouter([
       },
       {
         path: "Login",
-        element: <Login />,
+        element: (
+          <Suspense fallback={<div>loading...</div>}>
+            <Login />
+          </Suspense>
+        ),
       },
       {
-        path: "Account",
-        element: <Account />,
+        path: "otp-valid",
+        element: (
+          <Suspense fallback={<div>loading...</div>}>
+            <OtpValid />
+          </Suspense>
+        ),
+      },
+      {
+        path: "PasswordRecovery",
+        element: (
+          <Suspense fallback={<div>loading...</div>}>
+            <PasswordRecovery />,
+          </Suspense>
+        ),
+      },
+      {
+        path: "PasswordRecovery/NewPassword",
+        element: (
+          <Suspense fallback={<div>loading...</div>}>
+            <NewPassword />
+          </Suspense>
+        ),
       },
       {
         path: "Register",
-        element: <Register />,
+        element: (
+          <Suspense fallback={<div>loading...</div>}>
+            <Register />{" "}
+          </Suspense>
+        ),
       },
       {
-        path: "supplementaryForm",
-        element: <SupplementaryForm />,
+        path: "/store/AddAudience",
+        element: (
+          <Suspense fallback={<div>loading...</div>}>
+            <AddAudience />
+          </Suspense>
+        ),
+      },
+      {
+        path: "/store/SuccessfulPayment",
+        element: (
+          <Suspense fallback={<div>loading...</div>}>
+            <SuccessfulPayment />,
+          </Suspense>
+        ),
+      },
+      {
+        path: "/store/FailedPayment",
+        element: (
+          <Suspense fallback={<div>loading...</div>}>
+            <FailedPayment />,
+          </Suspense>
+        ),
+      },
+      {
+        path: "/store/SurveyView/:id",
+        element: (
+          <Suspense fallback={<div>loading...</div>}>
+            <SurveyView />
+          </Suspense>
+        ),
+      },
+      {
+        path: "/store/SurveyView/SurveyResult",
+        element: (
+          <Suspense fallback={<div>loading...</div>}>
+            <SurveyResult />
+          </Suspense>
+        ),
       },
       {
         path: "store/tickets/viewTicket/:idTicket",
-        element: <ViewTicket />,
+        element: (
+          <Suspense fallback={<div>loading...</div>}>
+            <ViewTicketStores />{" "}
+          </Suspense>
+        ),
       },
+      {
+        path: "admin/tickets/viewTicket/:idTicket",
+        element: (
+          <Suspense fallback={<div>loading...</div>}>
+            <ViewTicketAdmin />,
+          </Suspense>
+        ),
+      },
+      {
+        path: "users/tickets/viewTicket/:idTicket",
+        element: (
+          <Suspense fallback={<div>loading...</div>}>
+            <ViewTicketUsers />,
+          </Suspense>
+        ),
+      },
+      {
+        path: "admin/UserManagment/ViewSendReport/:idstore",
+        element: (
+          <Suspense fallback={<div>loading...</div>}>
+            <ViewSendReport />,
+          </Suspense>
+        ),
+      },
+      {
+        path: "admin/UserManagment/ViewListOfFinancialReport/:idstore",
+        element: (
+          <Suspense fallback={<div>loading...</div>}>
+            <ViewListOfFinancialReport />
+          </Suspense>
+        ),
+      },
+      {
+        path: "admin/SmsSendingPanel/viewSmsDetails/:idSms",
+        element: (
+          <Suspense fallback={<div>loading...</div>}>
+            <ViewSmsDeTails />,
+          </Suspense>
+        ),
+      },
+      {
+        path: "admin/SmsSendingPanel/viewSmsDetailsReport/:idSmsReport",
+        element: (
+          <Suspense fallback={<div>loading...</div>}>
+            <ViewSmsDeTailsReport />,
+          </Suspense>
+        ),
+      },
+
       {
         path: "/store/",
         element: <RootStoreLayout />,
@@ -92,103 +273,131 @@ const router = createBrowserRouter([
           },
           {
             path: "Dashboard",
-            element: <Dashboard />,
+            element: (
+              <Suspense fallback={<div>loading...</div>}>
+                <Dashboard />
+              </Suspense>
+            ),
           },
           {
             path: "Groups",
-            element: <Groups />,
-          },
-          {
-            path: "Groups/AddGroup",
-            element: <AddGroup />,
-          },
-          {
-            path: "Groups/ViewGroup/:idGroup",
-            element: <ViewGroup />,
-          },
-          {
-            path: "OccasionalMessage",
-            element: <OccasionalMessage />,
-          },
-          {
-            path: "OccasionalMessage/AddOccasionalMesssage",
-            element: <AddOccasionalMesssage />,
-          },
-          {
-            path: "OccasionalMessage/ViewOccasionalMessage/:idMessage",
-            element: <ViewOccasionalMessage />,
+            element: (
+              <Suspense fallback={<div>loading...</div>}>
+                <Groups />
+              </Suspense>
+            ),
           },
           {
             path: "Lottery",
-            element: <Lottery />,
-          },
-          {
-            path: "Lottery/AddLottery",
-            element: <AddLottery />,
+            element: (
+              <Suspense fallback={<div>loading...</div>}>
+                <Lottery />
+              </Suspense>
+            ),
           },
           {
             path: "Lottery/LotteryResult",
-            element: <LotteryResult />,
+            element: (
+              <Suspense fallback={<div>loading...</div>}>
+                <LotteryResult />
+              </Suspense>
+            ),
           },
           {
-            path: "Lottery/ShowLotteryWinners",
-            element: <ShowLotteryWinners />,
+            path: "Lottery/ShowLotteryWinners/:id",
+            element: (
+              <Suspense fallback={<div>loading...</div>}>
+                <ShowLotteryWinners />
+              </Suspense>
+            ),
           },
           {
             path: "Survey/AddSurvey",
-            element: <AddSurvey />,
-          },
-          {
-            path: "Notes",
-            element: <Notes />,
-          },
-          {
-            path: "Notes/addNotePhone",
-            element: <AddNotePhone />,
-          },
-          {
-            path: "Notes/viewNote/:idNote",
-            element: <ViewNotePhone />,
+            element: (
+              <Suspense fallback={<div>loading...</div>}>
+                <AddSurvey />
+              </Suspense>
+            ),
           },
           {
             path: "SendSms",
-            element: <SendSms />,
+            element: (
+              <Suspense fallback={<div>loading...</div>}>
+                <SendSms />
+              </Suspense>
+            ),
+          },
+          {
+            path: "AddAudience",
+            element: (
+              <Suspense fallback={<div>loading...</div>}>
+                <AddAudience />
+              </Suspense>
+            ),
           },
           {
             path: "Survey",
-            element: <Survey />,
+            element: (
+              <Suspense fallback={<div>loading...</div>}>
+                <Survey />
+              </Suspense>
+            ),
           },
           {
             path: "Survey/ViewSurvey/:idOpinion",
-            element: <ViewSurvey />,
+            element: (
+              <Suspense fallback={<div>loading...</div>}>
+                <ViewSurvey />
+              </Suspense>
+            ),
           },
           {
             path: "Tickets",
-            element: <Tickets />,
+            element: (
+              <Suspense fallback={<div>loading...</div>}>
+                <StoresTickets />
+              </Suspense>
+            ),
           },
           {
             path: "Tickets/AddTicket",
-            element: <AddTickets />,
-          },
-          {
-            path: "SendReports",
-            element: <SendReports />,
+            element: (
+              <Suspense fallback={<div>loading...</div>}>
+                <StoresAddTickets />
+              </Suspense>
+            ),
           },
           {
             path: "FinancialReports",
-            element: <FinancialReports />,
-          },
-          {
-            path: "ChargeAccount",
-            element: <ChargeAccount />,
+            element: (
+              <Suspense fallback={<div>loading...</div>}>
+                <FinancialReports />
+              </Suspense>
+            ),
           },
           {
             path: "DirectPayment",
-            element: <DirectPayment />,
+            element: (
+              <Suspense fallback={<div>loading...</div>}>
+                <DirectPayment />
+              </Suspense>
+            ),
           },
           {
             path: "DepositToTheAccount",
-            element: <DepositToTheAccount />,
+            element: (
+              <Suspense fallback={<div>loading...</div>}>
+                <DepositToTheAccount />
+              </Suspense>
+            ),
+          },
+          {
+            path: "Account",
+            element: (
+              <Suspense fallback={<div>loading...</div>}>
+                <Account />
+              </Suspense>
+            ),
           },
         ],
       },
@@ -202,58 +411,216 @@ const router = createBrowserRouter([
           },
           {
             path: "Dashboard",
-            element: <AdminDashboard />,
+            element: (
+              <Suspense fallback={<div>loading...</div>}>
+                <AdminDashboard />
+              </Suspense>
+            ),
           },
           {
             path: "Setting",
-            element: <Setting />,
+            element: (
+              <Suspense fallback={<div>loading...</div>}>
+                <Setting />
+              </Suspense>
+            ),
           },
           {
             path: "UserManagement",
-            element: <UserManagement />,
+            element: (
+              <Suspense fallback={<div>loading...</div>}>
+                <UserManagement />
+              </Suspense>
+            ),
           },
           {
-            path: "ManagingTexts",
-            element: <ManagingTexts />,
+            path: "UserManagement/viewUser/:idUser",
+            element: (
+              <Suspense fallback={<div>loading...</div>}>
+                <ViewUser />
+              </Suspense>
+            ),
+          },
+          {
+            path: "StoreManagement",
+            element: (
+              <Suspense fallback={<div>loading...</div>}>
+                <StoreManagement />
+              </Suspense>
+            ),
+          },
+          {
+            path: "StoreManagement/viewStore/:idStore",
+            element: (
+              <Suspense fallback={<div>loading...</div>}>
+                <ViewStore />
+              </Suspense>
+            ),
           },
           {
             path: "NotificationManagement",
-            element: <NotificationManagement />,
+            element: (
+              <Suspense fallback={<div>loading...</div>}>
+                <NotificationManagement />
+              </Suspense>
+            ),
           },
           {
             path: "SmsSendingPanel",
-            element: <SmsSendingPanel />,
+            element: (
+              <Suspense fallback={<div>loading...</div>}>
+                <SmsSendingPanel />
+              </Suspense>
+            ),
           },
           {
             path: "Tickets",
-            element: <AdminTickets />,
+            element: (
+              <Suspense fallback={<div>loading...</div>}>
+                <AdminTickets />
+              </Suspense>
+            ),
           },
           {
-            path: "ListOfPhonebooks",
-            element: <ListOfPhonebooks />,
+            path: "ListOfGroups",
+            element: (
+              <Suspense fallback={<div>loading...</div>}>
+                <ListOfGroups />
+              </Suspense>
+            ),
+          },
+          {
+            path: "ListOfGroups/viewGroup/:idGroup",
+            element: (
+              <Suspense fallback={<div>loading...</div>}>
+                <ViewGroup />
+              </Suspense>
+            ),
           },
           {
             path: "ListOfPolls",
-            element: <ListOfPolls />,
+            element: (
+              <Suspense fallback={<div>loading...</div>}>
+                <ListOfPolls />
+              </Suspense>
+            ),
+          },
+          {
+            path: "ListOfPolls/AddOrEditSurvey",
+            element: (
+              <Suspense fallback={<div>loading...</div>}>
+                <AddOrEditSurvey />
+              </Suspense>
+            ),
           },
           {
             path: "LotteryList",
-            element: <LotteryList />,
+            element: (
+              <Suspense fallback={<div>loading...</div>}>
+                <LotteryList />
+              </Suspense>
+            ),
+          },
+          {
+            path: "LotteryList/ShowLotteryWinners/:id",
+            element: (
+              <Suspense fallback={<div>loading...</div>}>
+                <LotteryWinners />
+              </Suspense>
+            ),
           },
           {
             path: "ListOfFinancialReports",
-            element: <ListOfFinancialReports />,
+            element: (
+              <Suspense fallback={<div>loading...</div>}>
+                <ListOfFinancialReports />
+              </Suspense>
+            ),
+          },
+          {
+            path: "ListOfFinancialReports/SystemDeposit",
+            element: (
+              <Suspense fallback={<div>loading...</div>}>
+                <SystemDeposit />
+              </Suspense>
+            ),
           },
         ],
+      },
+      {
+        path: "/users/",
+        element: <RootusersLayout />,
+        children: [
+          {
+            path: "",
+            element: <Navigate to={"Dashboard"} replace={true} />,
+          },
+          {
+            path: "Dashboard",
+            element: (
+              <Suspense fallback={<div>loading...</div>}>
+                <UsersDashboard />
+              </Suspense>
+            ),
+          },
+          {
+            path: "Tickets",
+            element: (
+              <Suspense fallback={<div>loading...</div>}>
+                <UsersTickets />
+              </Suspense>
+            ),
+          },
+          {
+            path: "Tickets/AddTicket",
+            element: (
+              <Suspense fallback={<div>loading...</div>}>
+                <UsersAddTickets />
+              </Suspense>
+            ),
+          },
+          {
+            path: "Tickets/AddTicket",
+            element: (
+              <Suspense fallback={<div>loading...</div>}>
+                <UsersAddTickets />
+              </Suspense>
+            ),
+          },
+          {
+            path: "Authentication",
+            element: (
+              <Suspense fallback={<div>loading...</div>}>
+                <Authentication />
+              </Suspense>
+            ),
+          },
+          {
+            path: "Registeration",
+            element: (
+              <Suspense fallback={<div>loading...</div>}>
+                <Registeration />
+              </Suspense>
+            ),
+          },
+        ],
+      },
+      {
+        path: "*",
+        element: (
+          <Suspense fallback={<div>loading...</div>}>
+            <Page404 />
+          </Suspense>
+        ),
       },
     ],
   },
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
-  <React.StrictMode>
-    <Provider store={reduxStore}>
+  <Provider store={reduxStore}>
+    <Suspense fallback={<div>loading ...</div>}>
       <RouterProvider router={router} />
-    </Provider>
-  </React.StrictMode>
+    </Suspense>
+  </Provider>
 );

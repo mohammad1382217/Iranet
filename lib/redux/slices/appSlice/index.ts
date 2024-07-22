@@ -1,3 +1,3 @@
 export * from './appSlice'
-export * from './thunks'
+export * from './thunk'
 export * from './selectors'

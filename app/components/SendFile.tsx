@@ -1,25 +1,30 @@
-import React, { useRef } from "react";
+import * as yup from "yup";
 import { Parag } from "./tools";
-import Button_component from "./Button";
+import React, { useRef } from "react";
 import { ErrorMessage, Field, Form, Formik } from "formik";
+const ButtonComponent = React.lazy(() => import("./Button"));
+
 import {
   appSlice,
-  selectIsLastStep,
   selectSelectedTxtFile,
   useDispatch,
   useSelector,
 } from "../../lib/redux";
-import * as yup from "yup";
+import { HiOutlineArrowCircleRight } from "react-icons/hi";
+import { useNavigate } from "react-router-dom";
 
 const maxFileSize = 5 * 1024 * 1024;
 const supportedTextTypes = ["text/plain"];
 
-export const SendFile: React.FC = () => {
+const SendFile: React.FC = () => {
   const dispatch = useDispatch();
-  const isLastStep = useSelector(selectIsLastStep);
-  const handleNext = () => {
-    !isLastStep && dispatch(appSlice.actions.setActiveStep(1));
+  const navigate = useNavigate();
+
+  const handleNextLevel = () => {
+    dispatch(appSlice.actions.setShowModals("showModalSendByFile"));
+    dispatch(appSlice.actions.setShowModals("showModalSendReport"));
   };
+
   const InputTxtRef = useRef<HTMLInputElement>(null);
   const validationSchema = yup.object().shape({
     selectedTxtFile: yup
@@ -41,20 +46,26 @@ export const SendFile: React.FC = () => {
     }
   };
   const selectedTxtFile = useSelector(selectSelectedTxtFile);
+
   return (
-    <div className="flex flex-col gap-3.5 mt-5 mb-10 px-6 w-96">
+    <div className="flex flex-col gap-3.5 max-w-96">
+      <Parag
+        Paragraph={
+          "فایل حاوی شماره تلفن مخاطبینی که قصد ارسال پیامک به آنها را دارید انتخاب کنید."
+        }
+        Pclass={"text-sm text-gray-600 text-right font-normal sm-max:text-xs"}
+      />
       <Formik
         initialValues={{ selectedTxtFile }}
         onSubmit={(values) => {
           // Handle form submission
-          if (values) {
-          }
+          if (values) {}
           console.log("Final form values:", values);
           // You can perform further actions with the form values here
         }}
         validationSchema={validationSchema}
       >
-        {({ handleChange, handleBlur, values, setFieldValue }) => (
+        {({ handleChange, setFieldValue }) => (
           <Form
             className="flex flex-col justify-center items-center h-full w-full gap-2"
             action=""
@@ -88,22 +99,39 @@ export const SendFile: React.FC = () => {
             <ErrorMessage
               name="selectedTxtFile"
               component="div"
-              className="text-red-500 text-sm"
+              className="text-red-500 text-sm self-start"
             />
             <Parag
               Paragraph={"بارگذاری فایل با فرمت txt"}
               Pclass={"!w-full text-base text-gray-600 font-normal"}
             />
-            <Button_component
-              onClick={handleNext}
-              children={"تایید و ورود به مرحلۀ بعد"}
+            <ButtonComponent
+              onClick={handleNextLevel}
               ButtonClass={
                 "!w-full flex-shrink-0 mt-5 py-2.5 px-[18px] bg-secondary"
               }
-            />
+            >
+              تایید و ورود به مرحلۀ بعد
+            </ButtonComponent>
+            <ButtonComponent
+              onClick={() => navigate("/store/Dashboard")}
+              ButtonClass="flex items-center justify-center mx-auto bg-white shadow-none hover:shadow-none"
+            >
+              <div className="flex items-center gap-2 text-sm text-[#151515] font-medium">
+                <HiOutlineArrowCircleRight
+                  className={"h-3.5 w-3.5 mx-auto text-[#E53935]"}
+                />
+                <div>
+                  <span className="text-[#757575]">لغو عملیات و</span> برگشت به
+                  داشبورد
+                </div>
+              </div>
+            </ButtonComponent>
           </Form>
         )}
       </Formik>
     </div>
   );
 };
+
+export default SendFile;

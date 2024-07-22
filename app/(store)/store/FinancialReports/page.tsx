@@ -1,200 +1,168 @@
-import { ConfigProvider, Input, InputRef, Space, Table, Tag } from "antd";
-import Button_component from "../../../components/Button";
-import fa_IR from "antd/locale/fa_IR";
-import {
-  selectticketsSearchText,
-  selectticketsSearchedColumn,
-  sendReportSlice,
-  useDispatch,
-  useSelector,
-} from "../../../../lib/redux";
-import React, { useRef } from "react";
-import { useNavigate } from "react-router-dom";
-import {
-  ColumnType,
-  ColumnsType,
-  FilterConfirmProps,
-} from "antd/es/table/interface";
-import { SearchOutlined } from "@ant-design/icons";
-import { FaRegTrashAlt } from "react-icons/fa";
-import Highlighter from "react-highlight-words";
+import React from "react";
+const Badge = React.lazy(() => import("antd/es/badge/index"));
+const Tag = React.lazy(() => import("antd/es/tag/index"));
+import HeaderWithButton from "../../../components/HeaderWithButton";
+import CustomTable, { CustomColumnType } from "../../../components/Table";
 
 const data: DataType[] = [
   {
     key: "1",
-    date: "1401/10/10",
-    amount: 50000,
-    transactionType: ["واریز به حساب"],
+    transactionType: "پیامک اطلاع رسانی",
+    tariff: "تعرفه رایگان (12434 ریال)",
+    price: "100,100",
+    unit: "پیامک",
+    remaining: "534,232,000",
+    condition: "موفق",
+    trackingCode:"03898725",
+    dateRequest: "1400/00/00 - 12:21"
   },
   {
-    key: "2",
-    date: "1401/11/20",
-    amount: 1000000,
-    transactionType: ["شارژ حساب"],
+    key: "1",
+    transactionType: "پیامک مناسبتی",
+    tariff: "تعرفه رایگان (12434 ریال)",
+    price: "100,100",
+    unit: "پیامک",
+    remaining: "534,232,000",
+    condition: "موفق",
+    trackingCode:"03898725",
+    dateRequest: "1400/00/00 - 12:21",
   },
   {
-    key: "3",
-    date: "1402/10/21",
-    amount: 129000,
-    transactionType: ["هزینۀ پیامک اطلاع رسانی"],
+    key: "1",
+    transactionType:  "پرداخت مستقیم",
+    tariff: "تعرفه رایگان (12434 ریال)",
+    price: "100,100",
+    unit: "پیامک",
+    remaining: "534,232,000",
+    condition: "موفق",
+    trackingCode:"03898725",
+    dateRequest: "1400/00/00 - 12:21",
   },
   {
-    key: "4",
-    date: "1402/06/02",
-    amount: 75000,
-    transactionType: ["پیامک مناسبتی"],
+    key: "1",
+    transactionType: "واریز به حساب",
+    tariff: "تعرفه رایگان (12434 ریال)",
+    price: "100,100",
+    unit: "پیامک",
+    remaining: "534,232,000",
+    condition: "موفق",
+    trackingCode:"03898725",
+    dateRequest: "1400/00/00 - 12:21",
   },
 ];
 
 const FinancialReports: React.FC = () => {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const searchTextValue = useSelector(selectticketsSearchText);
-  const searchedColumn = useSelector(selectticketsSearchedColumn);
-  const searchInput = useRef<InputRef>(null);
-
-  const handleSearch = (
-    selectedKeys: string[],
-    confirm: (param?: FilterConfirmProps) => void,
-    dataIndex: DataIndex
-  ) => {
-    confirm();
-    dispatch(sendReportSlice.actions.setSearchText(selectedKeys[0]));
-    dispatch(sendReportSlice.actions.setSearchedColumn(dataIndex));
-  };
-
-  const handleReset = (clearFilters: () => void) => {
-    clearFilters();
-    dispatch(sendReportSlice.actions.setSearchText(""));
-  };
-
-  const getColumnSearch = (
-    dataIndex: DataIndex,
-    name: string
-  ): ColumnType<DataType> => ({
-    filterDropdown: ({
-      setSelectedKeys,
-      selectedKeys,
-      confirm,
-      clearFilters,
-    }) => (
-      <div
-        style={{
-          padding: 8,
-          width: 250,
-        }}
-        onKeyDown={(e) => e.stopPropagation()}
-      >
-        <Input
-          ref={searchInput}
-          className="font-thin font-[Estedad-FD]"
-          placeholder={`جستجو در ${name}`}
-          value={selectedKeys[0]}
-          onChange={(e) =>
-            setSelectedKeys(e.target.value ? [e.target.value] : [])
-          }
-          onPressEnter={() =>
-            handleSearch(selectedKeys as string[], confirm, dataIndex)
-          }
-          style={{
-            marginBottom: 8,
-            display: "block",
-          }}
-        />
-        <Space className="w-full flex flex-row justify-between gap-2">
-          <Button_component
-            Type="submit"
-            onClick={() => clearFilters && handleReset(clearFilters)}
-            ButtonClass="!w-[105px] !h-[28px] border-secondary border-2 bg-[#FFFFFF] bg-gray-50 text-xs font-bold px-2.5 py-1.5 flex justify-between items-center gap-2"
-          >
-            <span className="text-black text-[10px]">پاک سازی متن</span>
-            <FaRegTrashAlt color="black" />
-          </Button_component>
-          <Button_component
-            onClick={() =>
-              handleSearch(selectedKeys as string[], confirm, dataIndex)
-            }
-            ButtonClass="!w-[123px] !h-[28px] bg-gray-50 text-xs font-bold px-2.5 py-1.5 flex justify-center items-center bg-secondary gap-2"
-          >
-            <span className="text-[10px]">جستجو</span>
-            <SearchOutlined className="w-4 h-4 leading-normal"/>
-          </Button_component>
-        </Space>
-      </div>
-    ),
-    filterIcon: (filtered: boolean) => (
-      <SearchOutlined
-        style={{
-          color: filtered ? "#1677ff" : undefined,
-        }}
-      />
-    ),
-    onFilter: (value: any, record) =>
-      record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
-    onFilterDropdownOpenChange: (visible: boolean) => {
-      if (visible) {
-        setTimeout(() => searchInput.current?.select(), 100);
-      }
-    },
-    render: (text) =>
-      searchedColumn === dataIndex ? (
-        <Highlighter
-          highlightStyle={{
-            backgroundColor: "#DFF8F2",
-            padding: 0,
-          }}
-          searchWords={[searchTextValue]}
-          autoEscape
-          textToHighlight={text ? text.toString() : ""}
-        />
-      ) : (
-        text
-      ),
-  });
-
-  const columns: ColumnsType<DataType> = [
+  const columns: CustomColumnType<DataType>[] = [
     {
-      title: "تاریخ",
-      dataIndex: "date",
-      key: "date",
+      title: "",
+      dataIndex: "downUp",
+      key: "downUp",
+      width:"auto",
       align: "center",
-      ...getColumnSearch("date","تاریخ"),
-      sorter: (a, b) => a.date.localeCompare(b.date),
-      render: (text) => <a>{text}</a>,
+      // sorter: (a, b) => +a.price - +b.price,
+      render(value, record, index) {
+        return index
+      },
+    },
+    {
+      title: "تاریخ  و ساعت تراکنش",
+      dataIndex: "dateRequest",
+      key: "dateRequst",
+      align: "center",
+      width:"15%",
+      DateRangeProps: true,
+      sorter: (a, b) => a.dateRequest.localeCompare(b.dateRequest),
+      // render: (text) => <Link>{text}</Link>,
     },
     {
       title: "نوع تراکنش",
       dataIndex: "transactionType",
       key: "transactionType",
       align: "center",
+      width:"10%",
       filters: [
         {
           text: "واریز به حساب",
           value: "واریز به حساب",
         },
         {
-          text: "هزینۀ پیامک اطلاع رسانی",
-          value: "هزینۀ پیامک اطلاع رسانی",
+          text: "پیامک اطلاع رسانی",
+          value: "پیامک اطلاع رسانی",
         },
         {
-          text: "شارژ حساب",
-          value: "شارژ حساب",
+          text:  "پیامک مناسبتی",
+          value:  "پیامک مناسبتی",
         },
         {
-          text: "پیامک مناسبتی",
-          value: "پیامک مناسبتی",
+          text: "پرداخت مستقیم",
+          value: "پرداخت مستقیم",
         },
       ],
-      onFilter: (value: any, record) => record.transactionType.includes(value),
-      render: (transactionType: string[]) => (
+      onFilter: (value: React.Key | boolean, record) =>
+        record.transactionType.includes(value as string),
+      render: (transactionType: string) => (
         <span>
-          {transactionType.map((tag) => {
+          {[transactionType].map((tag) => {
             let color: string;
-            if (tag === "هزینۀ پیامک اطلاع رسانی") {
-              color = "yellow";
-            } else if (tag === "واریز به حساب") {
+            if (tag ===  "واریز به حساب") {
               color = "purple";
+            } else if (tag ===  "پیامک اطلاع رسانی") {
+              color = "gold";
             } else if (tag === "پیامک مناسبتی") {
+              color = "volcano";
+            } else if (tag === "پرداخت مستقیم") {
+              color = "blue";
+            } else {
+              color = "";
+            }
+            return (
+              <Tag color={color} key={tag}>
+                {tag.toUpperCase()}
+              </Tag>
+            );
+          })}
+        </span>
+      ),
+    },
+    {
+      title: "تعرفه",
+      dataIndex: "tariff",
+      key: "tariff",
+      width:"10%",
+
+      align: "center",
+      searchProps: true,
+      sorter: (a, b) => +a.tariff - +b.tariff,
+    },
+    {
+      title: "مبلغ",
+      dataIndex: "price",
+      key: "price",
+      width:"10%",
+      align: "center",
+      // searchProps: true,
+      sorter: (a, b) => +a.price - +b.price,
+    },
+    {
+      title: "واحد",
+      dataIndex: "unit",
+      key: "unit",
+      width:"10%",
+
+      align: "center",
+      filters: [
+        {
+          text: "پیامک",
+          value: "پیامک",
+        },
+      ],
+      onFilter: (value: React.Key | boolean, record) =>
+        record.transactionType.includes(value as string),
+      render: (transactionType: string) => (
+        <span>
+          {[transactionType].map((tag) => {
+            let color: string;
+            if (tag === "پیامک") {
               color = "orange";
             } else {
               color = "blue";
@@ -209,44 +177,88 @@ const FinancialReports: React.FC = () => {
       ),
     },
     {
-      title: "مبلغ",
-      dataIndex: "amount",
-      key: "amount",
+      title: "مانده (پیامک)",
+      dataIndex: "remaining",
+      key: "remaining",
       align: "center",
-      ...getColumnSearch("amount","مبلغ"),
-      sorter: (a, b) => a.amount - b.amount,
+      width:"10%",
+      sorter: (a, b) => +a.remaining - +b.remaining,
+    },
+    {
+      title: "وضعیت",
+      dataIndex: "condition",
+      align: "center",
+      filters: [
+        {
+          text: "موفق",
+          value: "موفق",
+        },
+        {
+          text: "ناموفق",
+          value: "ناموفق",
+        },
+      ],
+      onFilter: (value: React.Key | boolean, record: DataType) =>
+        record.condition === value,
+      render: (condition: string) => (
+        <span>
+          {[condition].map((tag) => {
+            let color: string;
+            if (tag === "موفق") {
+              color = "green";
+            } else if (tag === "ناموفق") {
+              color = "red";
+            } else {
+              color = "";
+            }
+            return (
+              <p lang="fa" role="text"
+                key={condition}
+                className="flex flex-row justify-center items-baseline"
+              >
+                {condition}
+                <Badge className="mr-1" size="default" color={color}></Badge>
+              </p>
+            );
+          })}
+        </span>
+      ),
+    },
+    {
+      title: "کد رهگیری",
+      dataIndex: "trackingCode",
+      align: "center",
+      searchProps: true,
     },
   ];
 
   return (
-    <div className="flex flex-col items-center p-10 sm:!p-5 xl:w-full h-full">
-      <div className="w-full h-16 rounded-lg bg-[#FAFAFA] flex p-3 justify-between items-center">
-        <p className="text-2xl font-semibold sm:text-sm text-[#151515]">
-          لیست کل سوابق تراکنشات مالی
-        </p>
-      </div>
-      <div className="mb-5 w-full p-0 bg-cover rounded-lg md:mb-3 hover:cursor-pointer">
-        <ConfigProvider locale={fa_IR}>
-          <Table
-            className="mt-5"
-            bordered
-            dataSource={data}
-            columns={columns}
-          />
-        </ConfigProvider>
+    <div className="flex flex-col items-center p-10 sm-max:!p-5 xl-max:w-full h-full">
+      <HeaderWithButton HeaderTitle={"لیست کل سوابق تراکنشات مالی"} />
+      <div className="mt-10 mb-5 w-full p-0 bg-cover rounded-lg md-max:mb-3 hover:cursor-pointer">
+        <CustomTable
+          bordered
+          size="large"
+          dataSource={data}
+          columns={columns}
+          theme={"secondary"}
+        />
       </div>
     </div>
   );
 };
 
-export default FinancialReports; 
+export default FinancialReports;
 
 // Types
 interface DataType {
-  key: React.Key;
-  date: string;
-  amount: number;
-  transactionType: string[];
+  key: React.ReactNode;
+  transactionType: string;
+  tariff: string;
+  price: string;
+  unit: string;
+  remaining: string;
+  condition: string;
+  dateRequest: string;
+  trackingCode: string;
 }
-
-type DataIndex = keyof DataType;

@@ -1,37 +1,62 @@
 import React from "react";
-import Button_component from "../Button";
+import ButtonComponent from "../Button";
+import { weekDays } from "../../Register/page";
 import { FaRegTrashAlt } from "react-icons/fa";
-import DatePicker, { DateObject } from "react-multi-date-picker";
 import persian from "react-date-object/calendars/persian";
 import persian_fa from "react-date-object/locales/persian_fa";
-import { weekDays } from "../../Register/page";
+const DatePicker = React.lazy(() => import("react-multi-date-picker"));
 
-export const AccrodionFilterDate: React.FC = () => {
+const AccrodionFilterDate: React.FC = () => {
   // const inputData
-  const handleDelete = () => {};
-  // const handleDateChange = (date: DateObject | DateObject[] | null) => {
-  //   SetData(data);
-  // };
-  // const [data, SetData] = useState("");
+  const [Date, setDate] = React.useState(["", ""]);
+  const [disable, setDisable] = React.useState(true);
+  // const handleDateChange = (date: DateObject | DateObject[] | null) => {};
+  const handleDelete = () => {
+    setDisable(true);
+    console.log(Date);
+    setDate(["", ""]);
+  };
+  
+  React.useEffect(() => {
+    if (Date[0].length > 0 || Date[1].length > 0) {
+      setDisable(false);
+      console.log(Date[0].length);
+    }
+  }, Date);
+  
   return (
-    <div className="flex flex-col gap-1.5 mt-5 p-3   border border-gray-300 rounded-lg">
+    <div className="flex flex-col gap-1.5 mt-5 p-3 border border-gray-300 rounded-lg">
       <div className="flex justify-between flex-row items-center">
-        <p className="text-lg font-extrabold text-[#212121]">
+        <p lang="fa" role="text" className="text-lg font-extrabold text-[#212121]">
           فیلتر تاریخ تولد
         </p>
-        <Button_component ButtonClass="!w-[105px] !h-[34px] border-[#E53935] border-2 bg-[#FFFFFF] text-xs font-bold px-2.5 py-1.5 flex justify-between items-center gap-2">
+        <ButtonComponent
+          disabled={disable}
+          onClick={handleDelete}
+          ButtonClass={`${
+            disable ? "border-[#CFD8DC]" : "border-[#E53935]"
+          } !w-[105px] !h-[34px]  border-2 bg-[#FFFFFF] text-xs font-bold px-2.5 py-1.5 flex justify-between items-center gap-2`}
+        >
+          {" "}
           <span className="text-[12px] text-[#263238]">حذف فیلتر</span>
           <FaRegTrashAlt className="w-4 h-4 leading-normal text-[#263238]" />
-        </Button_component>
+        </ButtonComponent>
       </div>
       <div className="inline-flex flex-col items-center justify-center gap-[5px]">
         <div className="w-full flex flex-row items-baseline justify-between ">
-          <p className="w-16 text-base font-normal text-[#151515]">از تاریخ</p>
+          <p lang="fa" role="text" className="w-16 text-base font-normal text-textColor">از تاریخ</p>
 
           <DatePicker
             format="YYYY/MM/DD"
             // value={""}
             // onChange={(date) => handleDateChange(date)}
+            value={Date[0]}
+            onChange={(e) =>
+              setDate([
+                // new DateObject(e).convert(persian, persian_fa).format(),
+                Date[1],
+              ])
+            }
             weekDays={weekDays}
             className="custom-calendar"
             calendar={persian}
@@ -41,12 +66,22 @@ export const AccrodionFilterDate: React.FC = () => {
           />
         </div>
         <div className="w-full flex flex-row items-baseline justify-between ">
-          <p className="w-16 text-base font-normal text-[#151515]">تا تاریخ</p>
+          <p lang="fa" role="text" className="w-16 text-base font-normal text-textColor">تا تاریخ</p>
 
           <DatePicker
             format="YYYY/MM/DD"
+            value={Date[1]}
             // value={data}
-            // onChange={(date) => handleDateChange(date)}
+            // onFocusedDateChange={(e) => {console.log(e) }}
+            onChange={(e) =>
+              setDate([
+                Date[0],
+                // new DateObject(e).convert(persian, persian_fa).format(),
+              ])
+            }
+            // onChange={arrey =>  console.log(arrey.join(",\n")) }
+
+            // onPropsChange={(e) => {console.log(e) }}
             weekDays={weekDays}
             className="custom-calendar"
             calendar={persian}
@@ -59,3 +94,5 @@ export const AccrodionFilterDate: React.FC = () => {
     </div>
   );
 };
+
+export default AccrodionFilterDate;

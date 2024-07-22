@@ -1,54 +1,60 @@
-import React, { useRef } from "react";
-import fa_IR from "antd/locale/fa_IR";
-import { FaRegTrashAlt, FaPlus } from "react-icons/fa";
-import Button_component from "../../../components/Button";
-import { SearchOutlined } from "@ant-design/icons";
-import Highlighter from "react-highlight-words";
+import { FaPlus } from "react-icons/fa";
+import React, { Suspense } from "react";
+import { FiUserPlus } from "react-icons/fi";
+import { Link, useNavigate } from "react-router-dom";
+import "../../../components/TableInputNote/TableInputNote.scss";
+import raffle from "../../../assets/images/raffle_dashbaord.webp";
+import CustomTable, { CustomColumnType } from "../../../components/Table";
+import rectangle_dashbaord_mini_box from "../../../assets/images/rectangle_dashbaord_mini_box.webp";
+import rectangle_dashbaord_mini_boxRight from "../../../assets/images/rectangle_dashbaord_mini_boxRight.webp";
 import {
-  dashboardSlice,
-  selectSearchText,
-  selectSearchedColumn,
   useSelector,
   useDispatch,
   appSlice,
-  selectShowModal,
+  selectShowModals,
 } from "../../../../lib/redux";
-import raffle from "../../../assets/images/raffle_dashbaord.png";
-import rectangle_dashbaord_mini_boxRight from "../../../assets/images/rectangle_dashbaord_mini_boxRight.png";
-import { Space, ConfigProvider, Table, Input, Popover, InputRef } from "antd";
-import { IconButton, Typography } from "@material-tailwind/react";
-import DialogTable from "../../../components/anniversaryDialog";
-import "../../../components/TableInputNote/TableInputNote.scss";
-import { Link } from "react-router-dom";
-import { ColumnType, FilterConfirmProps } from "antd/es/table/interface";
-import Modal from "../../../components/Modal";
-import { NotificationBox } from "../../../components/NotificationBox";
-import { PercentagePieChart } from "../../../components/PercentagePieChart";
-import { DashboardCard } from "../../../components/DashboardCard";
-import { ColumnsType } from "antd/lib/table";
+
+const Modal = React.lazy(() => import("../../../components/Modal"));
+const Popover = React.lazy(() => import("antd/es/popover/index"));
+const ButtonComponent = React.lazy(() => import("../../../components/Button"));
+const DashboardCard = React.lazy(
+  () => import("../../../components/DashboardCard")
+);
+const DialogTable = React.lazy(
+  () => import("../../../components/anniversaryDialog")
+);
+const IconButton = React.lazy(
+  () => import("@material-tailwind/react/components/IconButton/index")
+);
+const Typography = React.lazy(
+  () => import("@material-tailwind/react/components/Typography/index")
+);
+const PercentagePieChart = React.lazy(
+  () => import("../../../components/PercentagePieChart")
+);
 
 const data: DataType[] = [
   {
     key: "1",
-    name: "پیام شماره 1",
+    SendCode: "12345678",
     time: "1400/00/00",
     text: "لورم  یپسوم متن ساختگی  یپسوم متن ساختگی ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت ",
   },
   {
     key: "2",
-    name: "پیام شماره 2",
+    SendCode: "12345678",
     time: "1400/00/00",
     text: "لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت م ایپسوم متن ",
   },
   {
     key: "3",
-    name: "پیام شماره 3",
+    SendCode: "12345678",
     time: "1400/00/00",
     text: "لورم ایپسومایپسومایپسومایپسومایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت ایپسومایپسومایپسومایپسومایپسوم",
   },
   {
     key: "4",
-    name: "پیام شماره 4",
+    SendCode: "12345678",
     time: "امروز",
     text: "لورم ایپسوم متنمتنمتنمتنمتنمتنمتنمتن ساختگی با تولید سادگی نامفهوم از صنعت ایپسومایپسومایپسومایپسومایپسومایپسومایپسومایپسومایپسومایپسوم",
   },
@@ -57,27 +63,27 @@ const data: DataType[] = [
 export const chartList: chartListType[] = [
   {
     lable: "عالی",
-    percent: [15, 85],
+    percent: [20, 100],
     fill: "#FF5050",
   },
   {
     lable: "خوب",
-    percent: [30, 70],
+    percent: [30, 100],
     fill: "#FD6E6E",
   },
   {
     lable: "متوسط",
-    percent: [40, 60],
+    percent: [40, 100],
     fill: "#FF9C9C",
   },
   {
     lable: "ضعیف",
-    percent: [5, 95],
+    percent: [0, 100],
     fill: "#FFB7B7",
   },
   {
     lable: "خیلی ضعیف",
-    percent: [10, 90],
+    percent: [10, 100],
     fill: "#FFE3E3",
   },
 ];
@@ -85,126 +91,43 @@ export const chartList: chartListType[] = [
 const Dashboard = () => {
   // table dashbaord
   const dispatch = useDispatch();
-  const showModal = useSelector(selectShowModal);
-  const showModalHandler = () => {
-    dispatch(appSlice.actions.setShowModal());
-  };
-  const searchTextValue = useSelector(selectSearchText);
-  const searchedColumn = useSelector(selectSearchedColumn);
-  const searchInput = useRef<InputRef>(null);
-  const handleSearch = (
-    selectedKeys: string[],
-    confirm: (param?: FilterConfirmProps) => void,
-    dataIndex: DataIndex
-  ) => {
-    confirm();
-    dispatch(dashboardSlice.actions.setSearchText(selectedKeys[0]));
-    dispatch(dashboardSlice.actions.setSearchedColumn(dataIndex));
+  const navigate = useNavigate();
+  const showModals = useSelector(selectShowModals);
+
+  const showModalHandler = (name: string) => {
+    dispatch(appSlice.actions.setShowModals(name));
   };
 
-  const handleReset = (clearFilters: () => void) => {
-    clearFilters();
-    dispatch(dashboardSlice.actions.setSearchText(""));
-  };
+  const showModalWelcomeHandler = () =>
+    dispatch(appSlice.actions.setShowModals("showModalWelcome"));
 
-  const getColumnSearchProps = (
-    dataIndex: DataIndex,
-    name: string
-  ): ColumnType<DataType> => ({
-    filterDropdown: ({
-      setSelectedKeys,
-      selectedKeys,
-      confirm,
-      clearFilters,
-    }) => (
-      <div
-        style={{
-          padding: 8,
-          width: 250,
-        }}
-        onKeyDown={(e) => e.stopPropagation()}
-      >
-        <Input
-          ref={searchInput}
-          className="font-thin bg-gray-50"
-          placeholder={`جستجو در ${name}`}
-          value={selectedKeys[0]}
-          onChange={(e) =>
-            setSelectedKeys(e.target.value ? [e.target.value] : [])
-          }
-          onPressEnter={() =>
-            handleSearch(selectedKeys as string[], confirm, dataIndex)
-          }
-          style={{
-            marginBottom: 8,
-            display: "block",
-          }}
-        />
-        <Space className="w-full flex flex-row justify-between gap-2">
-          <Button_component
-            Type="submit"
-            onClick={() => clearFilters && handleReset(clearFilters)}
-            ButtonClass="!w-[105px] !h-[28px] border-secondary border-2 bg-[#FFFFFF] bg-gray-50 text-xs font-bold px-2.5 py-1.5 flex justify-between items-center gap-2"
-          >
-            <span className="text-black text-[10px]">پاک سازی متن</span>
-            <FaRegTrashAlt color="black" />
-          </Button_component>
-          <Button_component
-            onClick={() =>
-              handleSearch(selectedKeys as string[], confirm, dataIndex)
-            }
-            ButtonClass="!w-[123px] !h-[28px] bg-gray-50 text-xs font-bold px-2.5 py-1.5 flex justify-center items-center bg-secondary gap-2"
-          >
-            <span className="text-[10px]">جستجو</span>
-            <SearchOutlined className="w-4 h-4 leading-normal" />
-          </Button_component>
-        </Space>
-      </div>
-    ),
-    filterIcon: (filtered: boolean) => (
-      <SearchOutlined
-        style={{
-          color: filtered ? "#1677ff" : undefined,
-        }}
-      />
-    ),
-    onFilter: (value: any, record) =>
-      record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
-    onFilterDropdownOpenChange: (visible: boolean) => {
-      if (visible) {
-        setTimeout(() => searchInput.current?.select(), 100);
-      }
-    },
-    render: (text: string) =>
-      searchedColumn === dataIndex ? (
-        <Highlighter
-          highlightStyle={{
-            backgroundColor: "#DFF8F2",
-            padding: 0,
-          }}
-          searchWords={[searchTextValue]}
-          autoEscape
-          textToHighlight={text ? text.toString() : ""}
-        />
-      ) : (
-        text
-      ),
-  });
+  ///time dialog
+  const [time, setTime] = React.useState(new Date());
 
-  const columns = [
+  const options = { timeZone: "Asia/Tehran", hour12: false };
+  const iranianTime = time.toLocaleTimeString("en-US", options);
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      setTime(new Date());
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const columns: CustomColumnType<any>[] = [
     {
-      title: "عنوان پیام",
-      dataIndex: "name",
-      key: "name",
-      width: "30%",
-      ...getColumnSearchProps("name", "عنوان پیام"),
+      title: "شناسه ارسال",
+      dataIndex: "SendCode",
+      key: "SendCode",
+      align: "center",
+      searchProps: true,
     },
     {
       title: "تاریخ ارسال",
       dataIndex: "time",
       key: "time",
       align: "center",
-      width: "15%",
+
       sorter: (a: DataType, b: DataType) => a.time.localeCompare(b.time),
     },
     {
@@ -212,124 +135,199 @@ const Dashboard = () => {
       dataIndex: "text",
       key: "text",
       ellipsis: true,
-      width: "55%",
-      ...getColumnSearchProps("text", "متن پیام"),
+
+      searchProps: true,
       render: (text: string) => (
-        <Popover content={<div className="">{text}</div>}>
-          <div className="flex justify-center mx-7 px-2">
-            <span >{text.slice(0, 60)}</span>
+        <Popover className="" content={<div className="">{text}</div>}>
+          <div className="flex justify-start">
+            <span>{text.slice(0, 60)}</span>
             <span>...</span>
           </div>
         </Popover>
       ),
     },
   ];
+
   return (
-    <div className="container flex flex-row lg:flex-col">
-      <div className="w-3/4 p-10 sm:!py-2 sm:!px-5 xl:w-full h-full flex items-center content-center flex-col gap-10 lg:gap-5">
+    <>
+      <div className="w-full p-10 sm-max:!py-2 sm-max:!px-5 xl-max:w-full h-full flex items-center justify-center flex-col gap-10 lg-max:gap-5">
         {/* -------- قرعه کشی -------- */}
-        <div
-          style={{ backgroundImage: `url(${raffle})` }}
-          className="w-full h-16 p-3 px-6 md:mt-3  bg-cover rounded-lg hover:cursor-pointer bg-gray-50 flex justify-between items-center"
-        >
-          <h1 className="font-semibold text-2xl sm:text-sm">قرعه کشی</h1>
-          <Link to="/store/lottery">
-            <h5 className="font-normal text-sm sm:text-xs text-[#757575]">
-              ورود به صفحۀ قرعه کشی ها
-            </h5>
-          </Link>
-        </div>
+        <section className="w-full flex flex-row lg-max:flex-col items-center gap-4">
+          <div
+            style={{
+              backgroundImage: `url(${rectangle_dashbaord_mini_boxRight})`,
+            }}
+            className="w-full flex items-center h-16 py-3 px-6 md-max:mt-3 bg-cover rounded-lg hover:cursor-pointer bg-gray-50"
+          >
+            <Link
+              className="w-full flex justify-between items-center"
+              to="/store/AddAudience"
+            >
+              <h1 className="font-semibold text-2xl sm-max:text-sm inline">
+                افزودن مخاطب
+              </h1>
+              <div className="font-normal text-sm sm-max:text-xs text-[#757575] inline">
+                <FiUserPlus color="#FD6E6E" className="w-5 h-5" />
+              </div>
+            </Link>
+          </div>
+          <div
+            style={{ backgroundImage: `url(${raffle})` }}
+            className="w-full flex items-center h-16 py-3 px-6 md-max:mt-3 bg-cover rounded-lg hover:cursor-pointer bg-gray-50"
+          >
+            <Link
+              className="w-full flex justify-between items-center"
+              to="/store/lottery"
+            >
+              <h1 className="font-semibold text-2xl sm-max:text-sm inline">
+                قرعه کشی
+              </h1>
+              <h2 className="font-normal text-sm sm-max:text-xs text-[#757575] inline">
+                ورود به صفحۀ قرعه کشی ها
+              </h2>
+            </Link>
+          </div>
+        </section>
         {/* -------- باکس های سالگردو شارژ حساب شماره های ثبت شده -------- */}
-        <div className="container grid grid-cols-3 lg:grid-cols-1 gap-4 items-center justify-center">
-          <DashboardCard
-            HeaderCard={"تعداد شماره های ثبت شده"}
-            UrlLinkCard={"#"}
-            LinkCard={""}
-            OnClick={() => {}}
-          >
-            <div className="flex flex-col">
-              <div className="container flex flex-row gap-6 xl:gap-3">
-                <div className="2xl:!text-sm text-sm flex items-center font-light text-[#78909C] gap-2.5">
-                  <span>امروز : </span><p className="text-[#FD6E6E] text-2xl">23</p>
+        <section className="w-full grid grid-cols-3 lg-max:grid-cols-1 gap-4 items-center justify-center">
+          <Suspense fallback={<div>Loading...</div>}>
+            <DashboardCard
+              HeaderCard={"تعداد شماره های ثبت شده"}
+              LinkCard={""}
+              OnClick={() => {}}
+              UrlImage={rectangle_dashbaord_mini_box}
+              classLink={"text-[#00503A]"}
+              isLink={false}
+            >
+              <div className="flex flex-col">
+                <div className="w-full flex flex-row gap-6 xl-max:gap-3">
+                  <div className="2xl-max:!text-sm text-sm flex items-center font-light text-[#78909C] gap-2.5">
+                    <span>امروز : </span>
+                    <p
+                      lang="fa"
+                      role="text"
+                      className="text-[#FD6E6E] text-2xl"
+                    >
+                      23
+                    </p>
+                  </div>
+                  <div className="2xl-max:!text-sm text-sm flex items-center font-light text-[#78909C] gap-2.5">
+                    <span>ماه قبل : </span>
+                    <p
+                      lang="fa"
+                      role="text"
+                      className="text-[#FD6E6E] text-2xl"
+                    >
+                      150
+                    </p>
+                  </div>
                 </div>
-                <div className="2xl:!text-sm text-sm flex items-center font-light text-[#78909C] gap-2.5">
-                  <span>ماه قبل : </span><p className="text-[#FD6E6E] text-2xl">150</p>
+                <div className="2xl-max:!text-sm text-sm flex items-center font-medium text-[#78909C] gap-2.5">
+                  <span>تعداد کل مشتریان :</span>
+                  <p lang="fa" role="text" className="text-[#FD6E6E] text-2xl">
+                    500
+                  </p>
                 </div>
               </div>
-              <div className="2xl:!text-sm text-sm flex items-center font-medium text-[#78909C] gap-2.5">
-                <span>تعداد کل مشتریان :</span>
-                <p className="text-[#FD6E6E] text-2xl">500</p>
-              </div>
-            </div>
-          </DashboardCard>
-          <DashboardCard
-            HeaderCard={"موجودی فعلی حساب"}
-            UrlLinkCard={"/store/ChargeAccount"}
-            LinkCard={
-              <div className="">
-                افزایش موجودی
-                <IconButton className="rounded-lg h-6 w-6 mr-3 bg-secondary">
-                  <FaPlus className="w-5 h-5 p-1" />
-                </IconButton>
-              </div>
-            }
-            OnClick={() => {}}
-          >
-            <p className="text-[#FD6E6E]">256.000 </p>
-            <p className="text-sm font-light -mr-2 text-[#78909C]">ریال</p>
-          </DashboardCard>
-          <DashboardCard
-            HeaderCard={"تعداد سالگرد های امروز"}
-            UrlLinkCard={"#"}
-            LinkCard={"مشاهدۀ همۀ سالگرد ها"}
-            OnClick={showModalHandler}
-          >
-            <p className="text-5xl font-medium text-[#FD6E6E]">28</p>
-          </DashboardCard>
-        </div>
+            </DashboardCard>
+            <DashboardCard
+              HeaderCard={"موجودی فعلی حساب"}
+              LinkCard={
+                <div className="">
+                  افزایش موجودی
+                  <IconButton
+                    aria-label="AddAudience"
+                    className="rounded-lg h-6 w-6 mr-3 bg-secondary"
+                  >
+                    <FaPlus className="w-5 h-5 p-1" />
+                  </IconButton>
+                </div>
+              }
+              OnClick={() => showModalHandler("showModalChargeAccount")}
+              UrlImage={rectangle_dashbaord_mini_box}
+              classLink={"text-[#00503A]"}
+              isLink={true}
+            >
+              <p lang="fa" role="text" className="text-[#FD6E6E]">
+                256.000{" "}
+              </p>
+              <p
+                lang="fa"
+                role="text"
+                className="text-sm font-light -mr-2 text-[#78909C]"
+              >
+                ریال
+              </p>
+            </DashboardCard>
+            <DashboardCard
+              HeaderCard={"تعداد سالگرد های امروز"}
+              LinkCard={"مشاهدۀ همۀ سالگرد ها"}
+              OnClick={() => showModalHandler("showModalOrigin")}
+              UrlImage={rectangle_dashbaord_mini_box}
+              classLink={"text-[#00503A]"}
+              isLink={true}
+            >
+              <p
+                lang="fa"
+                role="text"
+                className="text-5xl font-medium text-[#FD6E6E]"
+              >
+                28
+              </p>
+            </DashboardCard>
+          </Suspense>
+        </section>
         {/* -------- پیامک های ارسالی -------- */}
-        <div className="container flex flex-col gap-5">
-          <div className="container h-16 rounded-lg bg-gray-50 flex p-3 justify-between items-center">
-            <p className="font-medium text-lg sm:text-sm text-[#151515]">
+        <section className="w-full flex flex-col gap-5">
+          <div className="w-full h-16 rounded-lg bg-gray-50 flex p-3 justify-between items-center">
+            <p
+              lang="fa"
+              role="text"
+              className="font-medium text-lg sm-max:text-sm text-textColor"
+            >
               پیامک های ارسالی
             </p>
-            <Link to="/store/sendReports">
-              <Button_component
+            <Link to="/store/SendSms">
+              <ButtonComponent
                 children="مشاهدۀ همۀ پیام ها"
-                ButtonClass="bg-secondary text-xs font-bold h-11 flex justify-center items-center"
+                ButtonClass="bg-secondary text-xs font-bold sm-max:p-3 h-11 flex justify-center items-center"
               />
             </Link>
           </div>
           {/* -------- جدول -------- */}
-          <div className="container">
-            <ConfigProvider locale={fa_IR}>
-              <Table columns={columns as ColumnsType<DataType>} bordered dataSource={data} />
-            </ConfigProvider>
+          <div className="w-full mt-10">
+            <CustomTable
+              bordered
+              size="large"
+              columns={columns}
+              dataSource={data}
+              theme={"secondary"}
+            />
           </div>
-        </div>
+        </section>
         {/* -------- نظر سنجی -------- */}
-        <div
-          className="container py-6 px-8 bg-cover flex gap-28 xl:gap-16 lg:!gap-6 lg:flex-col items-center bg-gray-50 bg-right justify-around bg-no-repeat h-atuo rounded-lg"
+        <section
+          className="w-full py-6 px-8 bg-cover flex gap-28 xl-max:gap-16 lg-max:!gap-6 lg-max:flex-col items-center bg-gray-50 bg-right justify-around bg-no-repeat h-atuo rounded-lg"
           style={{
             backgroundImage: `url(${rectangle_dashbaord_mini_boxRight})`,
           }}
         >
-          <div className="flex flex-col items-center justify-center gap-4 lg:w-full lg:justify-between">
-            <div className="flex flex-col gap-2 lg:w-full lg:flex-start lg:justify-between">
+          <div className="flex flex-col items-center justify-center gap-4 lg-max:w-full lg-max:justify-between">
+            <div className="flex flex-col gap-2 lg-max:w-full lg-max:items-start lg-max:justify-between">
               <Typography
-                className="font-semibold sm:text-lg text-xl"
-                variant="h6"
+                className="font-semibold sm-max:text-lg text-xl"
+                variant="h3"
               >
                 آخرین نظر سنجی:
               </Typography>
               <Typography
-                className="font sm:text-xl font-semibold text-2xl"
-                variant="h4"
+                className="font sm-max:text-xl font-semibold text-2xl"
+                variant="h3"
               >
                 نظر سنجی عید نوروز
               </Typography>
             </div>
-            <div className="lg:w-full flex lg:items-start md:items-end sm:items-start flex-col">
+            <div className="lg-max:w-full flex lg-max:items-end md-max:items-end sm-max:items-start flex-col">
               <Link to="/store/survey">
                 <Typography
                   variant="small"
@@ -343,35 +341,74 @@ const Dashboard = () => {
           <div className="flex items-center justify-center text-xs">
             <PercentagePieChart chartData={chartList} />
           </div>
-        </div>
+        </section>
       </div>
-      {/* -------- اعلانات -------- */}
-      <NotificationBox NotificatonBoxClass={""} />
 
       {/* دیالوگ سالگرد */}
-      <Modal
-        modalHeaderClass="flex flex-row justify-between"
-        modalHeader={
-          <>
-            <p className="font-bold text-sm">سالگرد های امروز</p>
-            <div className="font-normal text-xl ">
-              تاریخ و ساعت : 12:21’ - <span>1 فروردین 1400</span>
+      <Suspense fallback={<div>Loading...</div>}>
+        <Modal
+          modalClass="!min-w-[60%] lg-max:!min-w-[90%]"
+          modalHeaderClass="flex flex-row justify-between -mb-2"
+          modalHeader={
+            <>
+              <p
+                lang="fa"
+                role="text"
+                className="font-bold text-xl md-max:text-sm"
+              ></p>
+              <div className="flex flex-row">
+                <span className="font-normal text-base"> تاریخ و ساعت : </span>
+                <span className="font-normal text-base">
+                  {new Intl.DateTimeFormat("fa-IR").format()}
+                </span>
+                <span> - </span>
+                <span className="font-normal text-base">{iranianTime}</span>
+              </div>
+            </>
+          }
+          modalBody={<DialogTable />}
+          modalFooter={
+            <ButtonComponent
+              onClick={() => showModalHandler("showModalOrigin")}
+              children="برگشت به داشبورد"
+              ButtonClass="bg-secondary text-xs font-bold h-11 -mt-6 flex items-center justify-center"
+            />
+          }
+          modalFooterClass="flex items-center justify-center"
+          Open={showModals.showModalOrigin}
+          HandleOpen={() => showModalHandler("showModalOrigin")}
+        />
+        <Modal
+          modalClass="!min-w-[28%] sm-max:!min-w-[90%] mb-2 scroll-auto"
+          modalHeaderClass="flex items-center mx-auto text-2xl font-medium"
+          modalHeader={"خوش آمدید!"}
+          modalBody={
+            "جهت مشاهده و تکمیل اطلاعات خود می‌توانید به صفحه حساب کاربری خود مراجعه کنید"
+          }
+          modalFooterClass="flex justify-center items-center"
+          modalFooter={
+            <div className="w-full flex gap-4">
+              <ButtonComponent
+                onClick={() => navigate("/store/Account")}
+                ButtonClass="w-full bg-white text-xs font-bold text-black h-10 flex items-center justify-center border border-[#2DCEA2]"
+              >
+                حساب کاربری
+              </ButtonComponent>
+              <ButtonComponent
+                ButtonClass="bg-secondary text-white px-10"
+                onClick={() => {
+                  showModalWelcomeHandler();
+                }}
+              >
+                <span>تایید</span>
+              </ButtonComponent>
             </div>
-          </>
-        }
-        modalBody={<DialogTable />}
-        modalFooter={
-          <Button_component
-            onClick={showModalHandler}
-            children="برگشت به داشبورد"
-            ButtonClass="bg-secondary text-xs font-bold h-11 flex items-center justify-center"
-          />
-        }
-        modalFooterClass="flex items-center justify-center"
-        Open={showModal}
-        HandleOpen={showModalHandler}
-      />
-    </div>
+          }
+          Open={showModals.showModalWelcome}
+          HandleOpen={showModalWelcomeHandler}
+        />
+      </Suspense>
+    </>
   );
 };
 
@@ -380,7 +417,7 @@ export default Dashboard;
 // Types
 interface DataType {
   key: React.Key;
-  name: string;
+  SendCode: string;
   time: string;
   text: string;
 }

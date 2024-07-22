@@ -1,215 +1,229 @@
+import React from "react";
+import moment from "moment-jalaali";
+import { chartListType } from "../Dashboard/page";
+import Modal from "../../../components/Modal";
+import { Parag } from "../../../components/tools";
+import { Link, useNavigate } from "react-router-dom";
+import "../../../components/TableInputNote/TableInputNote.scss";
+import { HiOutlineDocumentDuplicate } from "react-icons/hi";
+import ProgressBarChart from "../../../components/ProgressBarChart";
+import HeaderWithButton from "../../../components/HeaderWithButton";
+import CustomTable, { CustomColumnType } from "../../../components/Table";
+import ParticipantsDialogTable from "../../../components/ParticipantsDialogTable";
 import {
-  Badge,
-  Button,
-  ConfigProvider,
-  Input,
-  InputRef,
-  Space,
-  Table,
-} from "antd";
-import Button_component from "../../../components/Button";
-import fa_IR from "antd/locale/fa_IR";
-import {
+  SurveyData,
   SurveySlice,
   appSlice,
-  selectShowModal,
+  fetchSurveyMemberThunk,
+  fetchSurveyResultThunk,
+  fetchSurveyStopThunk,
+  fetchSurveyThunk,
+  selectIsStatusSurvey,
   selectShowModalParticipants,
-  selectShowModalResultSurvey,
+  selectShowModals,
   selectSurveyDatum,
-  selectticketsSearchText,
-  selectticketsSearchedColumn,
-  sendReportSlice,
+  selectSurveyMembers,
+  selectSurveyResults,
+  selectSurveyTitle,
+  selectUuid,
+  surveyResults,
   useDispatch,
   useSelector,
 } from "../../../../lib/redux";
-import React, { useRef } from "react";
-import {
-  ColumnType,
-  ColumnsType,
-  FilterConfirmProps,
-} from "antd/es/table/interface";
-import { SearchOutlined } from "@ant-design/icons";
-import { FaRegTrashAlt } from "react-icons/fa";
-import Highlighter from "react-highlight-words";
-import { NavLink, useNavigate } from "react-router-dom";
-import Modal from "../../../components/Modal";
-import { Parag } from "../../../components/tools";
-import ProgressBarChart from "../../../components/ProgressBarChart";
-import { chartList } from "../Dashboard/page";
-import { ParticipantsDialogTable } from "../../../components/ParticipantsDialogTable";
+
+const Spin = React.lazy(() => import("antd/es/spin/index"));
+const Badge = React.lazy(() => import("antd/es/badge/index"));
+const Space = React.lazy(() => import("antd/es/space/index"));
+const Button = React.lazy(() => import("antd/es/button/index"));
+const Input = React.lazy(() => import("antd/es/input/index"));
+const ButtonComponent = React.lazy(() => import("../../../components/Button"));
 
 const Survey: React.FC = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const showModal = useSelector(selectShowModal);
-  const showModalParticipants = useSelector(selectShowModalParticipants);
-  const showModalResultSurvey = useSelector(selectShowModalResultSurvey);
-  const SurveyDatum = useSelector(selectSurveyDatum);
-  const stopSurveyHandler = (record: DataType) => {
-    const updatedData = SurveyDatum.map((item) =>
-    item.key === record.key ? { ...item, surveyStatus: 'متوقف شده' } : item
-    );
-    dispatch(SurveySlice.actions.setSurveyDatum(updatedData));
-  }
-  const searchTextValue = useSelector(selectticketsSearchText);
-  const searchedColumn = useSelector(selectticketsSearchedColumn);
-  const searchInput = useRef<InputRef>(null);
 
-  const status = (key: string) => {
-    switch (key) {
-      case "متوقف شده":
-        return <Badge status="error" text="متوقف شده" />;
-      case "در جریان":
-        return <Badge status="success" text="در جریان" />;
-      case "در صف":
-        return <Badge status="processing" text="در صف" />;
+  React.useEffect(() => {
+    dispatch(fetchSurveyThunk());
+  }, []);
+
+  const handleCopy = () => {
+    navigator.clipboard
+      .writeText(`https://front-irannet.liara.run/store/SurveyView/${uuid}`)
+      .then(() => {
+        alert("متن با موفقیت کپی شد!");
+      })
+      .catch((err) => {
+        console.error("خطا در کپی کردن متن: ", err);
+      });
+  };
+
+  const uuid = useSelector(selectUuid);
+  const isLoadingSurvey = useSelector(selectIsStatusSurvey);
+  const surveyMembers = useSelector(selectSurveyMembers);
+  const showModals = useSelector(selectShowModals);
+  const showModalParticipants = useSelector(selectShowModalParticipants);
+  const SurveyDatum = useSelector(selectSurveyDatum);
+  const SurveyResults = useSelector(selectSurveyResults);
+  const surveyTitle = useSelector(selectSurveyTitle);
+  const colors = ["#FF5050", "#FD6E6E", "#FF9C9C"];
+
+  const transformData = (
+    surveyResults: surveyResults,
+    colors: string[]
+  ): chartListType[] => {
+    const entries = Object.entries(surveyResults.data);
+    return entries.map(([lable, percent], index) => ({
+      lable,
+      percent: [percent, 100 - percent], // محاسبه مکمل درصد
+      fill: colors[index] || "#FFFFFF",
+    }));
+  };
+
+  const handleShowResult = async (uuid: string, title: string) => {
+    dispatch(fetchSurveyResultThunk({ uuid }));
+    dispatch(SurveySlice.actions.setUuid(uuid));
+    dispatch(SurveySlice.actions.setSurvayTitle(title));
+    showModalHandler();
+  };
+
+  const stopSurveyHandler = async (uuid: string) => {
+    await dispatch(fetchSurveyStopThunk({ uuid }));
+    await dispatch(fetchSurveyThunk());
+  };
+
+  const status = (status: string) => {
+    switch (status) {
+      case "S":
+        return (
+          <p
+            lang="fa"
+            role="text"
+            className="flex flex-row justify-center items-baseline"
+          >
+            متوقف شده
+            <Badge className="mr-1" size="default" status="error" />
+          </p>
+        );
+      case "D":
+        return (
+          <p
+            lang="fa"
+            role="text"
+            className="flex flex-row justify-center items-baseline"
+          >
+            در جریان
+            <Badge className="mr-1" size="default" status="success" text="" />
+          </p>
+        );
+      case "Q":
+        return (
+          <p
+            lang="fa"
+            role="text"
+            className="flex flex-row justify-center items-baseline"
+          >
+            در صف
+            <Badge className="mr-1" size="default" status="processing" />
+          </p>
+        );
       default:
-        return <Badge status="default" text="پایان زمان" />;
+        return (
+          <p
+            lang="fa"
+            role="text"
+            className="flex flex-row justify-center items-baseline"
+          >
+            پایان زمان
+            <Badge className="mr-1" size="default" status="default" />
+          </p>
+        );
     }
   };
 
-  const editHandler = (action: number) => {
-    dispatch(SurveySlice.actions.setEditingId(action));
-    const editSurvey = SurveyDatum?.filter(SurveyData => SurveyData.key === action)[0];
-    dispatch(SurveySlice.actions.setSurveyData(editSurvey));
-  }
-  
+  const editHandler = (id: number) => {
+    dispatch(SurveySlice.actions.setEditingId(id));
+    dispatch(SurveySlice.actions.setIsEdit(true));
+    // const editSurvey: SurveyData = SurveyDatum?.filter(
+    //   (SurveyData) => +SurveyData.uuid === id
+    // )[0];
+    // dispatch(SurveySlice.actions.setSurveyData(editSurvey));
+  };
+
   const showModalHandler = () => {
-    dispatch(appSlice.actions.setShowModal());
+    dispatch(appSlice.actions.setShowModals("showModalOrigin"));
   };
 
   const showModalResultSurveyHandler = () => {
-    dispatch(appSlice.actions.setShowModalResultSurvey());
+    dispatch(appSlice.actions.setShowModals("showModalResultSurvey"));
+  };
+
+  const showModalSurveyHandler = (uuid: string) => {
+    dispatch(SurveySlice.actions.setUuid(uuid));
+    dispatch(appSlice.actions.setShowModals("showModalResultSurvey"));
+  };
+
+  const showModalSurveyMemberHandler = (uuid: string) => {
+    dispatch(fetchSurveyMemberThunk({ uuid }));
+    dispatch(SurveySlice.actions.setShowModalParticipants());
+    showModalHandler();
   };
 
   const showModalParticipantsHandler = () => {
     dispatch(SurveySlice.actions.setShowModalParticipants());
     showModalHandler();
-  }
-
-  const handleSearch = (
-    selectedKeys: string[],
-    confirm: (param?: FilterConfirmProps) => void,
-    dataIndex: DataIndex
-  ) => {
-    confirm();
-    dispatch(sendReportSlice.actions.setSearchText(selectedKeys[0]));
-    dispatch(sendReportSlice.actions.setSearchedColumn(dataIndex));
   };
 
-  const handleReset = (clearFilters: () => void) => {
-    clearFilters();
-    dispatch(sendReportSlice.actions.setSearchText(""));
-  };
-
-  const getColumnSearch = (
-    dataIndex: DataIndex,
-    name: string
-  ): ColumnType<DataType> => ({
-    filterDropdown: ({
-      setSelectedKeys,
-      selectedKeys,
-      confirm,
-      clearFilters,
-    }) => (
-      <div
-        style={{
-          padding: 8,
-          width: 250,
-        }}
-        onKeyDown={(e) => e.stopPropagation()}
-      >
-        <Input
-          ref={searchInput}
-          className="font-thin font-[Estedad-FD]"
-          placeholder={`جستجو در ${name}`}
-          value={selectedKeys[0]}
-          onChange={(e) =>
-            setSelectedKeys(e.target.value ? [e.target.value] : [])
-          }
-          onPressEnter={() =>
-            handleSearch(selectedKeys as string[], confirm, dataIndex)
-          }
-          style={{
-            marginBottom: 8,
-            display: "block",
-          }}
-        />
-        <Space className="w-full flex flex-row justify-between gap-2">
-          <Button_component
-            Type="submit"
-            onClick={() => clearFilters && handleReset(clearFilters)}
-            ButtonClass="!w-[105px] !h-[28px] border-secondary border-2 bg-[#FFFFFF] bg-gray-50 text-xs font-bold px-2.5 py-1.5 flex justify-between items-center gap-2"
-          >
-            <span className="text-black text-[10px]">پاک سازی متن</span>
-            <FaRegTrashAlt color="black" />
-          </Button_component>
-          <Button_component
-            onClick={() =>
-              handleSearch(selectedKeys as string[], confirm, dataIndex)
-            }
-            ButtonClass="!w-[123px] !h-[28px] bg-gray-50 text-xs font-bold px-2.5 py-1.5 flex justify-center items-center bg-secondary gap-2"
-          >
-            <span className="text-[10px]">جستجو</span>
-            <SearchOutlined className="w-4 h-4 leading-normal"/>
-          </Button_component>
-        </Space>
-      </div>
-    ),
-    filterIcon: (filtered: boolean) => (
-      <SearchOutlined
-        style={{
-          color: filtered ? "#1677ff" : undefined,
-        }}
-      />
-    ),
-    onFilter: (value: any, record) =>
-      record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
-    onFilterDropdownOpenChange: (visible: boolean) => {
-      if (visible) {
-        setTimeout(() => searchInput.current?.select(), 100);
-      }
-    },
-    render: (text) =>
-      searchedColumn === dataIndex ? (
-        <Highlighter
-          highlightStyle={{
-            backgroundColor: "#DFF8F2",
-            padding: 0,
-          }}
-          searchWords={[searchTextValue]}
-          autoEscape
-          textToHighlight={text ? text.toString() : ""}
-        />
-      ) : (
-        text
-      ),
-  });
-
-  const columns: ColumnsType<DataType> = [
+  const columns: CustomColumnType<SurveyData>[] = [
     {
       title: "عنوان نظرسنجی",
-      dataIndex: "survayTitle",
-      key: "survayTitle",
-      align: "center",
-      ...getColumnSearch("survayTitle", "عنوان نظرسنجی"),
-      render: (text) => <a>{text}</a>,
+      dataIndex: "title",
+      key: "title",
+      searchProps: true,
+      render: (text) => <Link to={""}>{text}</Link>,
     },
     {
-      title: "تاریخ",
-      dataIndex: "date",
-      width: "10%",
-      key: "date",
+      title: "تاریخ شروع",
+      dataIndex: "start_time",
+      key: "start_time",
       align: "center",
-      sorter: (a, b) => a.date.localeCompare(b.date),
-      render: (text) => <a>{text}</a>,
+      DateRangeProps: true,
+      sorter: (a, b) => a.start_time.localeCompare(b.start_time),
+      render: (text) => <>{moment(text).format("jYYYY/jMM/jDD - HH:mm")}</>,
+    },
+    {
+      title: "تاریخ پایان",
+      dataIndex: "start_time",
+      key: "end_time",
+      align: "center",
+      DateRangeProps: true,
+      sorter: (a, b) => a.start_time.localeCompare(b.start_time),
+      render: (text) => <>{moment(text).format("jYYYY/jMM/jDD - HH:mm")}</>,
     },
     {
       title: "وضعیت نظرسنجی",
-      dataIndex: "surveyStatus",
-      width: "15%",
-      key: "surveyStatus",
+      dataIndex: "status",
+      key: "status",
       align: "center",
+      filters: [
+        {
+          text: "S",
+          value: "متوقف شده",
+        },
+        {
+          text: "D",
+          value: "درجریان",
+        },
+        {
+          text: "E",
+          value: "پایان زمان",
+        },
+        {
+          text: "Q",
+          value: "در صف",
+        },
+      ],
+      onFilter: (value: React.Key | boolean, record: SurveyData) =>
+        record.status.includes(value as string),
       render: (key: string) => (
         <Space direction="vertical">{status(key)}</Space>
       ),
@@ -217,39 +231,76 @@ const Survey: React.FC = () => {
     {
       title: "نتایج",
       dataIndex: "surveyResults",
-      width: "15%",
       key: "surveyResults",
       align: "center",
-      render: () => (
-        <Space>
-          <Button type="link" onClick={showModalHandler}>
-            مشاهده نتایج
-          </Button>
-        </Space>
+      render: (_: string, record: SurveyData) => (
+        <Button
+          disabled={record.status === "Q" ? true : false}
+          className={`p-0  ${
+            record.status === "Q" ? "!text-blue-100" : "text-blue-700"
+          }`}
+          type="link"
+          onClick={() => handleShowResult(record.uuid, record.title)}
+        >
+          مشاهده
+        </Button>
       ),
     },
     {
       title: "لینک ها",
       dataIndex: "survayLinks",
-      width: "30%",
       key: "survayLinks",
       align: "center",
-      render: (text: string, record: DataType, action: number) => (
+      render: (_: string, record: SurveyData, index: number) => (
         <Space>
-          <Button type="link" onClick={showModalResultSurveyHandler}>
+          <Button
+            disabled={
+              record.status === "S" || record.status === "E" ? true : false
+            }
+            className={`p-0
+              ${
+                record.status === "S" || record.status === "E"
+                  ? "!text-blue-100"
+                  : "text-blue-700"
+              }`}
+            type="link"
+            onClick={() => showModalSurveyHandler(uuid)}
+          >
             لینک نظرسنجی
           </Button>
-          <NavLink to={`/store/survey/viewSurvey/${action + 1}`}>
-            <Button type="link" onClick={() => editHandler(action + 1)}>ویرایش</Button>
-          </NavLink>
+          {record.status === "Q" ? (
+            <Link to={`/store/survey/viewSurvey/${SurveyDatum[index].uuid}`}>
+              <Button
+                className={`p-0 text-blue-700`}
+                type="link"
+                onClick={() => editHandler(index + 1)}
+              >
+                ویرایش
+              </Button>
+            </Link>
+          ) : (
+            <Link to={`/store/survey/viewSurvey/${SurveyDatum[index].uuid}`}>
+              <Button
+                className={`p-0 text-blue-700`}
+                type="link"
+                onClick={() => editHandler(index + 1)}
+              >
+                مشاهده
+              </Button>
+            </Link>
+          )}
           <Button
-            type="link"
-            className={
-              record.surveyStatus === "متوقف شده"
-                ? "text-red-100"
-                : "text-red-700"
+            disabled={
+              record.status === "S" || record.status === "E" ? true : false
             }
-            onClick={() => stopSurveyHandler(record)}
+            type="link"
+            className={`p-0
+              ${
+                record.status === "S" || record.status === "E"
+                  ? "!text-red-100"
+                  : "text-red-700"
+              }`}
+            onClick={() => stopSurveyHandler(record.uuid)}
           >
             توقف نظرسنجی
           </Button>
@@ -259,32 +310,34 @@ const Survey: React.FC = () => {
   ];
 
   return (
-    <div className="flex flex-col items-center p-10 sm:!p-5 xl:w-full h-full">
-      <div className="w-full h-16 rounded-lg bg-[#FAFAFA] flex p-3 justify-between items-center">
-        <p className="text-2xl font-semibold sm:text-xs text-[#151515]">
-          لیست تمام نظرسنجی ها
-        </p>
-        <Button_component
-          onClick={() => navigate("/store/Survey/AddSurvey")}
-          ButtonClass="bg-secondary text-xs font-bold sm:p-5 h-11 flex justify-center items-center"
-        >
-          <div className="flex justify-center flex-row-reverse items-center">
-            <div>ایجاد نظرسنجی جدید</div>
-            <div className="text-xl sm:text-xs p-0 ml-3">+</div>
-          </div>
-        </Button_component>
-      </div>
-      <div className="mb-5 w-full p-0 bg-cover rounded-lg md:mb-3 hover:cursor-pointer">
-        <ConfigProvider locale={fa_IR}>
-          <Table
-            className="mt-5"
+    <div className="flex flex-col items-center p-10 sm-max:!p-5 xl-max:w-full h-full">
+      <HeaderWithButton
+        Button={
+          <ButtonComponent
+            onClick={() => navigate("/store/Survey/AddSurvey")}
+            ButtonClass="bg-secondary text-xs font-bold sm-max:p-3 h-11 flex justify-center items-center"
+          >
+            <div className="flex justify-center flex-row-reverse items-center sm-max:text-[0.625rem]">
+              <div>ایجاد نظرسنجی/مسابقه جدید</div>
+              <div className="text-xl sm-max:text-xs p-0 ml-3">+</div>
+            </div>
+          </ButtonComponent>
+        }
+        HeaderTitle={"لیست تمام نظرسنجی ها و مسابقات"}
+      />
+      <div className="mt-10 mb-5 w-full p-0 bg-cover rounded-lg md-max:mb-3 hover:cursor-pointer">
+        <Spin spinning={isLoadingSurvey === "loading"}>
+          <CustomTable
             bordered
+            size="large"
             dataSource={SurveyDatum}
             columns={columns}
+            theme={"secondary"}
           />
-        </ConfigProvider>
+        </Spin>
       </div>
       <Modal
+        modalClass="!min-w-[30%] sm-max:!min-w-[90%]"
         modalHeaderClass="flex flex-row justify-between"
         modalHeader={
           <>
@@ -299,97 +352,109 @@ const Survey: React.FC = () => {
               Paragraph={"لینک صفحۀ عمومی شرکت در نظرسنجی:"}
               Pclass={"text-base font-normal text-blue-gray-500 mb-4"}
             />
-            <div className="container relative inline-flex items-center">
+            <div className="container flex items-center gap-3">
+              <ButtonComponent
+                ButtonClass={
+                  "flex shrink-0 items-center justify-center h-8 sm-max:!p-3 bg-white border border-blue-gray-100 text-xs font-bold h-full"
+                }
+                onClick={handleCopy}
+              >
+                <HiOutlineDocumentDuplicate className="w-5 h-5 text-blue-gray-300" />
+              </ButtonComponent>
               <Input
-                dir="ltr"
-                placeholder="https://link.com/link_link"
-                className="absolute flex items-center justify-center gap-2.5 flex-grow flex-shrink-0 rounded-lg border-blue-gray-100 h-10 py-3 pl-3 pr-1.5 placeholder:leading-tight placeholder:text-sm placeholder:font-normal placeholder:text-blue-gray-300 cursor-auto"
+                style={{ direction: "ltr", textAlign: "left" }}
+                placeholder={`https://front-irannet.liara.run/store/SurveyView/${uuid}`}
+                className="flex items-center justify-center gap-2.5 flex-grow rounded-lg border-blue-gray-100 h-full py-3 pl-3 pr-1.5 placeholder:leading-tight placeholder:text-sm placeholder:font-normal placeholder:text-blue-gray-300 cursor-auto"
                 readOnly
               />
-              <Button_component
-                ButtonClass={
-                  "flex shrink-0 items-center justify-center relative -left-1 h-8 sm:!p-3 bg-blue-gray-300 text-xs font-bold ml-64"
-                }
-              >
-                کپی کردن
-              </Button_component>
             </div>
           </>
         }
         modalFooter={
-          <Button_component
-            onClick={showModalResultSurveyHandler}
-            ButtonClass="bg-red-900 text-xs font-bold text-white h-10 flex items-center justify-center"
-          >
-            بستن
-          </Button_component>
+          <div className="w-full flex gap-4">
+            <ButtonComponent
+              onClick={showModalResultSurveyHandler}
+              ButtonClass="text-red-900 text-xs font-bold bg-white h-10 flex items-center justify-center"
+            >
+              بستن
+            </ButtonComponent>
+            <ButtonComponent
+              onClick={() => navigate(`/store/SurveyView/${uuid}`)}
+              ButtonClass="w-full bg-white text-xs font-bold text-black h-10 flex items-center justify-center border border-[#2DCEA2]"
+            >
+              مشاهده نظرسنجی
+            </ButtonComponent>
+          </div>
         }
         modalFooterClass="flex items-center justify-end"
-        Open={showModalResultSurvey}
+        Open={showModals.showModalResultSurvey}
         HandleOpen={showModalResultSurveyHandler}
       />
       <Modal
-        modalHeaderClass="flex flex-row justify-between px-6 pb-2"
+        modalHeaderClass="flex flex-row justify-between pb-2"
         modalHeader={
-          <div className="container flex items-center justify-between text-xl font-semibold sm:text-base">
-            <h3 className="text-gray-900">
-              تعداد مشارکت کنندگان
-            </h3>
+          <div className="container flex items-center justify-between text-xl font-semibold sm-max:text-base">
+            <h3 className="text-gray-900">تعداد مشارکت کنندگان</h3>
             <div className="flex items-center justify-center bg-[#DFF8F2] py-2.5 px-5 rounded">
-              <p>123 نفر</p>
+              <p lang="fa" role="text">
+                {SurveyResults.member_count}
+              </p>
             </div>
           </div>
         }
+        modalBodyClass="h-auto"
         modalBody={
           <>
-            <ProgressBarChart chartData={chartList} />
+            <ProgressBarChart
+              chartData={transformData(SurveyResults, colors)}
+            />
           </>
         }
         modalFooter={
-          <div className="flex items-center gap-6 sm:gap-4">
-            <Button_component
-              onClick={showModalParticipantsHandler}
+          <div className="flex items-center gap-6 sm-max:gap-4">
+            <ButtonComponent
+              onClick={() => showModalSurveyMemberHandler(uuid)}
               ButtonClass="bg-secondary text-xs font-bold text-white h-10 flex items-center justify-center"
             >
               نمایش شرکت کنندگان
-            </Button_component>
-            <Button_component
-            onClick={showModalHandler}
-            ButtonClass="bg-red-900 text-xs font-bold text-white h-10 flex items-center justify-center"
+            </ButtonComponent>
+            <ButtonComponent
+              onClick={showModalHandler}
+              ButtonClass="bg-red-900 text-xs font-bold text-white h-10 flex items-center justify-center"
             >
-            بستن
-            </Button_component>
+              بستن
+            </ButtonComponent>
           </div>
         }
         modalFooterClass="flex items-center justify-end pt-2"
-        Open={showModal}
+        Open={showModals.showModalOrigin}
         HandleOpen={showModalHandler}
       />
       <Modal
-        modalHeaderClass="flex flex-row justify-between px-6 pb-2"
+        modalHeaderClass="flex flex-row justify-between pb-2"
         modalHeader={
-          <div className="container flex items-center justify-between text-xl font-semibold sm:text-base">
-            <h3 className="text-gray-900">
-            لیست شرکت کنندگان
-            </h3>
+          <div className="container flex items-center justify-between text-xl font-semibold sm-max:text-base">
+            <h3 className="text-gray-900">لیست شرکت کنندگان</h3>
             <div className="flex items-center justify-center bg-[#DFF8F2] py-2.5 px-5 rounded">
-              <p>نام نظرسنجی</p>
+              <p lang="fa" role="text">
+                {surveyTitle}
+              </p>
             </div>
           </div>
         }
         modalBody={
           <>
-            <ParticipantsDialogTable />
+            <ParticipantsDialogTable tableData={surveyMembers} />
           </>
         }
         modalFooter={
-          <div className="flex items-center justify-center gap-6 sm:gap-4">
-            <Button_component
-            onClick={showModalParticipantsHandler}
-            ButtonClass="bg-red-900 text-xs font-bold text-white h-10 flex items-center justify-center"
+          <div className="flex items-center justify-center gap-6 sm-max:gap-4">
+            <ButtonComponent
+              onClick={showModalParticipantsHandler}
+              ButtonClass="bg-red-900 text-xs font-bold text-white h-10 flex items-center justify-center"
             >
-            بستن
-            </Button_component>
+              بستن
+            </ButtonComponent>
           </div>
         }
         modalFooterClass="flex items-center justify-end pt-2"
@@ -401,13 +466,3 @@ const Survey: React.FC = () => {
 };
 
 export default Survey;
-
-// Types
-export interface DataType {
-  key: React.Key;
-  survayTitle: string;
-  date: string;
-  surveyStatus: string;
-}
-
-type DataIndex = keyof DataType;

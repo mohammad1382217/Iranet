@@ -5,5 +5,3 @@ import { ReduxState } from "../../store"
 // the state. Selectors can also be defined inline where they're used instead of
 // in the slice file. For example: `useSelector((state: RootState) => state.counter.value)`
 export const selectsendReportData = (state: ReduxState) => state.sendReport.sendReportData
-export const selectsendReportSearchText = (state: ReduxState) => state.sendReport.searchText
-export const selectsendReportSearchedColumn = (state: ReduxState) => state.sendReport.searchedColumn

@@ -1,63 +1,64 @@
-import { Chip } from "@material-tailwind/react";
+import Chip from "@material-tailwind/react/components/Chip/index";
 import {
   FiGrid,
   FiSliders,
   FiUser,
-  FiAlignCenter,
   FiBell,
   FiMessageSquare,
   FiMail,
   FiBarChart2,
+  FiUsers,
 } from "react-icons/fi";
-import { LuBook, LuThumbsUp, LuGift } from "react-icons/lu";
+import { HiOutlineShoppingBag } from "react-icons/hi";
+import { LuThumbsUp, LuGift } from "react-icons/lu";
 
-export const underMenu = [
+export const underMenuAdmin = [
   {
     id: 1,
-    title: <p>داشبورد</p>,
+    title: <p lang="fa" role="text">داشبورد</p>,
     icon: <FiGrid className="w-4 h-4" />,
     redirect: "/admin/dashboard",
-    color: "#0081E8",
+    color: "#013259",
     backgroundColor: "#D9EEFE",
   },
   {
     id: 2,
-    title: <p>تنظیمات</p>,
+    title: <p lang="fa" role="text">تنظیمات</p>,
     icon: <FiSliders className="w-4 h-4" />,
     redirect: "/admin/Setting",
-    color: "#0081E8",
+    color: "#013259",
     backgroundColor: "#D9EEFE",
   },
   {
     id: 3,
-    title: <p>مدیریت کاربران</p>,
+    title: <p lang="fa" role="text">مدیریت کاربران</p>,
     icon: <FiUser className="w-4 h-4" />,
     redirect: "/admin/UserManagement",
-    color: "#0081E8",
+    color: "#013259",
     backgroundColor: "#D9EEFE",
   },
   {
     id: 4,
-    title: <p>مدیریت متن ها</p>,
-    icon: <FiAlignCenter className="w-4 h-4" />,
-    redirect: "/admin/ManagingTexts",
-    color: "#0081E8",
+    title: <p lang="fa" role="text">مدیریت فروشگاه ها</p>,
+    icon: <HiOutlineShoppingBag className="w-4 h-4" />,
+    redirect: "/admin/StoreManagement",
+    color: "#013259",
     backgroundColor: "#D9EEFE",
   },
   {
     id: 5,
-    title: <p>مدیریت اعلانات و تبلیغات</p>,
+    title: <p lang="fa" role="text">مدیریت اعلانات و تبلیغات</p>,
     icon: <FiBell className="w-4 h-4" />,
     redirect: "/admin/NotificationManagement",
-    color: "#0081E8",
+    color: "#013259",
     backgroundColor: "#D9EEFE",
   },
   {
     id: 6,
-    title: <p>پنل ارسال پیامک</p>,
+    title: <p lang="fa" role="text">پنل ارسال پیامک</p>,
     icon: <FiMessageSquare className="w-4 h-4" />,
     redirect: "/admin/SmsSendingPanel",
-    color: "#0081E8",
+    color: "#013259",
     backgroundColor: "#D9EEFE",
   },
   {
@@ -65,7 +66,7 @@ export const underMenu = [
     title: (
       <div className="w-full h-10 !p-0 flex justify-between items-center rounded-lg">
         <div className="flex flex-row gap-2.5 items-center justify-start !p-0">
-          <p>تیکت ها</p>
+          <p lang="fa" role="text">تیکت ها</p>
         </div>
         <Chip
           value="14"
@@ -78,39 +79,39 @@ export const underMenu = [
     ),
     icon: <FiMail className="w-4 h-4" />,
     redirect: "/admin/Tickets",
-    color: "#0081E8",
+    color: "#013259",
     backgroundColor: "#D9EEFE",
   },
   {
     id: 8,
-    title: <p>لیست دفترچه تلفن ها</p>,
-    icon: <LuBook className="w-4 h-4" />,
-    redirect: "/admin/ListOfPhonebooks",
-    color: "#0081E8",
+    title: <p lang="fa" role="text">لیست گروه ها</p>,
+    icon: <FiUsers className="w-4 h-4" />,
+    redirect: "/admin/ListOfGroups",
+    color: "#013259",
     backgroundColor: "#D9EEFE",
   },
   {
     id: 9,
-    title: <p>لیست نظر سنجی ها</p>,
+    title: <p lang="fa" role="text">لیست نظر سنجی ها</p>,
     icon: <LuThumbsUp className="w-4 h-4" />,
     redirect: "/admin/ListOfPolls",
-    color: "#0081E8",
+    color: "#013259",
     backgroundColor: "#D9EEFE",
   },
   {
     id: 10,
-    title: <p>لیست قرعه کشی ها</p>,
+    title: <p lang="fa" role="text">لیست قرعه کشی ها</p>,
     icon: <LuGift className="w-4 h-4" />,
     redirect: "/admin/LotteryList",
-    color: "#0081E8",
+    color: "#013259",
     backgroundColor: "#D9EEFE",
   },
   {
     id: 11,
-    title: <p>لیست گزارشات مالی</p>,
+    title: <p lang="fa" role="text">لیست گزارشات مالی</p>,
     icon: <FiBarChart2 className="w-4 h-4" />,
     redirect: "/admin/ListOfFinancialReports",
-    color: "#0081E8",
+    color: "#013259",
     backgroundColor: "#D9EEFE",
   },
 ];

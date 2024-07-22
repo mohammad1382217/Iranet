@@ -5,7 +5,7 @@ import { createSlice, type PayloadAction } from '@reduxjs/toolkit'
 // import { incrementAsync } from './thunks'
 
 const initialState: occasionalmessageSliceState = {
-  occasionalmessageData: [
+  occasionalMessageData: [
     {
       key: 1,
       titlemessage: "پیام مناسبتی عید نوروز",
@@ -16,18 +16,15 @@ const initialState: occasionalmessageSliceState = {
       key: 2,
       titlemessage: "پیام مناسبتی عید ",
       senddate: "1400/08/10",
-      users:["بستی فروش ها", "نام دفترچه 1"],
+      users:["بستی فروش ها", "نام گروه 1"],
       textmessage: "لورم  سلامتی یپسوم متن ساختگی  یپسوم متن ساختگیصنعت "
     },
   ],
-  selectoptions: ["بستی فروش ها", "نام دفترچه 1","نام دفترچه 2"],
+  selectoptions: ["بستی فروش ها", "نام گروه 1","نام گروه 2"],
   selectedoption: [],
   titleMessage: '',
   textmessage:'',
-  lenghtTextArea: 0,
-  searchText: "",
   senddate: "",
-  searchedColumn: "",
   status: 'idle',
 }
 
@@ -36,14 +33,8 @@ export const occasionalmessageSlice = createSlice({
   initialState,
   // The `reducers` field lets us define reducers and generate associated actions
   reducers: {
-    setSearchText: (state ,actions : PayloadAction<string>) => {
-      state.searchText = actions.payload;
-    },
-    setSearchedColumn: (state ,actions : PayloadAction<string>) => {
-      state.searchedColumn = actions.payload;
-    },
-    setNewData: (state ,actions : PayloadAction<occasionalmessageData[]>) => {
-      state.occasionalmessageData = actions.payload;
+    setNewData: (state ,actions : PayloadAction<occasionalMessageData[]>) => {
+      state.occasionalMessageData = actions.payload;
     },
     setSelectedOption: (state ,actions : PayloadAction<string[]>) => {
       state.selectedoption = actions.payload;
@@ -54,9 +45,6 @@ export const occasionalmessageSlice = createSlice({
     settextmessage: (state ,actions : PayloadAction<string>) => {
       state.textmessage = actions.payload;
     },
-    setLenghtTextArea: (state ,actions : PayloadAction<number>) => {
-      state.lenghtTextArea = actions.payload;
-    },
     setsenddata: (state ,actions : PayloadAction<string>) => {
       state.senddate = actions.payload;
     },
@@ -65,18 +53,15 @@ export const occasionalmessageSlice = createSlice({
 
 /* Types */
 export interface occasionalmessageSliceState {
-  occasionalmessageData: occasionalmessageData[],
+  occasionalMessageData: occasionalMessageData[],
   selectoptions:string[],
-  selectedoption:string[],
+  selectedoption:string[] | string,
   titleMessage:string,
   textmessage:string,
-  lenghtTextArea: number,
-  searchText : string,
   senddate:string,
-  searchedColumn: string,
   status: 'idle' | 'loading' | 'failed'
 }
-export interface occasionalmessageData {
+export interface occasionalMessageData {
   key: React.Key,
   titlemessage: string,
   senddate: string,

@@ -1,175 +1,43 @@
-import React, { useRef } from "react";
-import {
-  Button,
-  ConfigProvider,
-  Form,
-  Input,
-  InputNumber,
-  InputRef,
-  Popconfirm,
-  Space,
-  Table,
-  Typography,
-  Upload,
-  UploadProps,
-  message,
-} from "antd";
-import fa_IR from "antd/locale/fa_IR";
-import Button_component from "./Button";
-import { SearchOutlined, UploadOutlined } from "@ant-design/icons";
+import React from "react";
 import { Link } from "react-router-dom";
-import { selectEditingKey, selectuserNoteData, selectuserNoteSearchText, selectuserNoteSearchedColumn, useDispatch, useSelector, userNoteSlice } from "../../lib/redux";
-import { ColumnType, FilterConfirmProps } from "antd/es/table/interface";
-import { FaRegTrashAlt } from "react-icons/fa";
-import Highlighter from "react-highlight-words";
+const ButtonComponent = React.lazy(() => import("./Button"));
+import UploadOutlined from "@ant-design/icons/UploadOutlined";
+import CustomTable, { CustomColumnType } from "./Table";
+import Form from "antd/es/form/index";
+const Button = React.lazy(() => import( "antd/es/button/index"));
+import Upload from "antd/es/upload/Upload";
+import message from "antd/es/message/index";
+import Popconfirm from "antd/es/popconfirm/index";
+import Typography from "antd/es/typography/index";
+import type { UploadProps } from "antd/es/upload/interface";
 
-const EditableCell: React.FC<EditableCellProps> = ({
-  editing,
-  dataIndex,
-  title,
-  inputType,
-  record,
-  index,
-  children,
-  ...restProps
-}) => {
-  const inputNode = inputType === "number" ? <InputNumber /> : <Input />;
+import {
+  appSlice,
+  selectEditingKeyUserNotes,
+  selectuserNoteData,
+  useDispatch,
+  useSelector,
+  userNoteSlice,
+} from "../../lib/redux";
 
-  return (
-    <td {...restProps}>
-      {editing ? (
-        <Form.Item
-          name={dataIndex}
-          style={{ margin: 0 }}
-          rules={[
-            {
-              required: true,
-              message: `${title} را وارد کنید!`,
-            },
-          ]}
-        >
-          {inputNode}
-        </Form.Item>
-      ) : (
-        children
-      )}
-    </td>
-  );
-};
-
-export const UsersNote: React.FC = () => {
+const UsersNote: React.FC = () => {
   const dispatch = useDispatch();
   const [form] = Form.useForm();
   const tableData = useSelector(selectuserNoteData);
-  const editingKey = useSelector(selectEditingKey);
-  const searchInput = useRef<InputRef>(null);
-  const searchTextValue = useSelector(selectuserNoteSearchText);
-  const searchedColumn = useSelector(selectuserNoteSearchedColumn);
-  
-  const handleSearch = (
-    selectedKeys: string[],
-    confirm: (param?: FilterConfirmProps) => void,
-    dataIndex: DataIndex
-  ) => {
-    confirm();
-    dispatch(userNoteSlice.actions.setSearchText(selectedKeys[0]));
-    dispatch(userNoteSlice.actions.setSearchedColumn(dataIndex));
-  };
-
-  const handleReset = (clearFilters: () => void) => {
-    clearFilters();
-    dispatch(userNoteSlice.actions.setSearchText(""));
-  };
-
-  const getColumnSearch = (
-    dataIndex: DataIndex,
-    name: string
-  ): ColumnType<DataType> => ({
-    filterDropdown: ({
-      setSelectedKeys,
-      selectedKeys,
-      confirm,
-      clearFilters,
-    }) => (
-      <div
-        style={{
-          padding: 8,
-          width: 250,
-        }}
-        onKeyDown={(e) => e.stopPropagation()}
-      >
-        <Input
-          ref={searchInput}
-          className="font-thin font-[Estedad-FD]"
-          placeholder={`جستجو در ${name}`}
-          value={selectedKeys[0]}
-          onChange={(e) =>
-            setSelectedKeys(e.target.value ? [e.target.value] : [])
-          }
-          onPressEnter={() =>
-            handleSearch(selectedKeys as string[], confirm, dataIndex)
-          }
-          style={{
-            marginBottom: 8,
-            display: "block",
-          }}
-        />
-        <Space className="w-full flex flex-row justify-between gap-2">
-          <Button_component
-            Type="submit"
-            onClick={() => clearFilters && handleReset(clearFilters)}
-            ButtonClass="!w-[105px] !h-[28px] border-secondary border-2 bg-[#FFFFFF] bg-gray-50 text-xs font-bold px-2.5 py-1.5 flex justify-between items-center gap-2"
-          >
-            <span className="text-black text-[10px]">پاک سازی متن</span>
-            <FaRegTrashAlt color="black" />
-          </Button_component>
-          <Button_component
-            onClick={() =>
-              handleSearch(selectedKeys as string[], confirm, dataIndex)
-            }
-            ButtonClass="!w-[123px] !h-[28px] bg-gray-50 text-xs font-bold px-2.5 py-1.5 flex justify-center items-center bg-secondary gap-2"
-          >
-            <span className="text-[10px]">جستجو</span>
-            <SearchOutlined className="w-4 h-4 leading-normal"/>
-          </Button_component>
-        </Space>
-      </div>
-    ),
-    filterIcon: (filtered: boolean) => (
-      <SearchOutlined
-        style={{
-          color: filtered ? "#1677ff" : undefined,
-        }}
-      />
-    ),
-    onFilter: (value: any, record) =>
-      record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
-    onFilterDropdownOpenChange: (visible: boolean) => {
-      if (visible) {
-        setTimeout(() => searchInput.current?.select(), 100);
-      }
-    },
-    render: (text : string) =>
-      searchedColumn === dataIndex ? (
-        <Highlighter
-          highlightStyle={{
-            backgroundColor: "#DFF8F2",
-            padding: 0,
-          }}
-          searchWords={[searchTextValue]}
-          autoEscape
-          textToHighlight={text ? text.toString() : ""}
-        />
-      ) : (
-        text
-      ),
-  });
-
-  const isEditing = (record: DataType) => record.key === editingKey;
+  const editingKey = useSelector(selectEditingKeyUserNotes);
 
   const edit = (record: Partial<DataType> & { key: React.Key }) => {
-    form.setFieldsValue({ name: "", age: "", address: "", ...record });
-    dispatch(userNoteSlice.actions.setEditingKey(record.key as string));
+    form.setFieldsValue({
+      firstName: "",
+      lastName: "",
+      birthdate: "",
+      job: "",
+      phoneNumber: "",
+      ...record,
+    });
+    dispatch(
+      userNoteSlice.actions.setEditingKeyUserNotes(record.key as string)
+    );
   };
 
   const handleDelete = (key: React.Key) => {
@@ -178,7 +46,7 @@ export const UsersNote: React.FC = () => {
   };
 
   const cancel = () => {
-    dispatch(userNoteSlice.actions.setEditingKey(""));
+    dispatch(appSlice.actions.setEditingKeyTable(""));
   };
 
   const save = async (key: React.Key) => {
@@ -194,66 +62,70 @@ export const UsersNote: React.FC = () => {
           ...row,
         });
         dispatch(userNoteSlice.actions.setNewData(newData));
-        dispatch(userNoteSlice.actions.setEditingKey(""));
+        dispatch(userNoteSlice.actions.setEditingKeyUserNotes(""));
       } else {
         newData.push(row);
         dispatch(userNoteSlice.actions.setNewData(newData));
-        dispatch(userNoteSlice.actions.setEditingKey(""));
+        dispatch(userNoteSlice.actions.setEditingKeyUserNotes(""));
       }
     } catch (errInfo) {
       console.log("Validate Failed:", errInfo);
     }
   };
 
-  type EditableColumnType = ColumnType<DataType> & { editable?: boolean };
-  
-  const columns : EditableColumnType[] = [
+  const columns: CustomColumnType<DataType>[] = [
     {
       title: "نام",
       dataIndex: "firstName",
-      width: "15%",
-      align: 'center',
+      key: "firstName",
+
+      align: "center",
       editable: true,
-      ...getColumnSearch("firstName", "نام"),
+      searchProps: true,
     },
     {
       title: "نام خانوادگی",
       dataIndex: "lastName",
-      width: "20%",
-      align: 'center',
+      key: "lastName",
+
+      align: "center",
       editable: true,
-      ...getColumnSearch("lastName", "نام خانوادگی"),
+      searchProps: true,
     },
     {
       title: "تاریخ تولد",
       dataIndex: "birthdate",
-      width: "10%",
-      align: 'center',
+      key: "birthdate",
+
+      align: "center",
       editable: true,
-      sorter: (a: DataType, b: DataType) => a.birthdate.localeCompare(b.birthdate),
+      sorter: (a: DataType, b: DataType) =>
+        a.birthdate.localeCompare(b.birthdate),
     },
     {
       title: "شغل",
       dataIndex: "job",
-      width: "10%",
-      align: 'center',
+      key: "job",
+
+      align: "center",
       editable: true,
-      ...getColumnSearch("job", "شغل"),
+      searchProps: true,
     },
     {
       title: "شماره تلفن",
       dataIndex: "phoneNumber",
-      width: "20%",
-      align: 'center',
+      key: "phoneNumber",
+
+      align: "center",
       editable: true,
-      ...getColumnSearch("job", "شغل"),
+      searchProps: true,
     },
     {
       title: "عملیات",
       dataIndex: "operation",
-      width: "15%",
-      align: 'center',
-      render: (_: any, record: DataType) => {
+
+      align: "center",
+      render: (_: string, record: DataType) => {
         const editable = isEditing(record);
         return editable ? (
           <div className="flex gap-20">
@@ -277,7 +149,9 @@ export const UsersNote: React.FC = () => {
                 title="آیا مطمئن هستید حذف میکنید؟"
                 onConfirm={() => handleDelete(record.key)}
               >
-                <Link className="!text-red-700" to={"#"}>حذف</Link>
+                <Link className="!text-red-700" to={"#"}>
+                  حذف
+                </Link>
               </Popconfirm>
             ) : null}
           </div>
@@ -285,22 +159,6 @@ export const UsersNote: React.FC = () => {
       },
     },
   ];
-
-  const mergedColumns = columns.map((col) => {
-    if (!col.editable) {
-      return col;
-    }
-    return {
-      ...col,
-      onCell: (record: DataType) => ({
-        record,
-        inputType: col.dataIndex === "phoneNumber" ? "number" : "text",
-        dataIndex: col.dataIndex,
-        title: col.title,
-        editing: isEditing(record),
-      }),
-    };
-  });
 
   const props: UploadProps = {
     name: "file",
@@ -329,79 +187,79 @@ export const UsersNote: React.FC = () => {
     },
   };
 
+  const isEditing = (record: DataType) => record.key === editingKey;
+
+  const mergedColumns = columns.map((col) => {
+    if (!col.editable) {
+      return col;
+    }
+    return {
+      ...col,
+      onCell: (record: DataType) => ({
+        record,
+        dataIndex: col.dataIndex,
+        title: col.title,
+        editing: isEditing(record),
+      }),
+    };
+  });
+
   return (
     <div className="w-full">
-      <div className="flex sm:flex-col h-33 items-center justify-center py-3 w-full">
-        <span className="text-2xl font-semibold sm:text-sm sm:mb-2 lg:text-base text-[#151515] w-full ">
+      <div className="flex sm-max:flex-col mt-2 h-33 items-center justify-center py-3 w-full">
+        <span className="font-bold text-xl sm-max:text-xl sm-max:my-3 lg-max:text-sm text-textColor w-full">
           افزودن مخاطب با فایل:
         </span>
-        <div className="flex items-center justify-center w-full">
-          <Upload {...props} maxCount={3} className="w-auto">
+        <div className="flex items-center justify-end sm-max:justify-between w-full">
+          <Upload {...props} maxCount={3} className=" sm-max:w-1/2">
             <Button
-              className="h-10 w-auto"
+              className="h-10 w-full px-5 sm-max:px-5 lg-max:!px-5"
               icon={<UploadOutlined />}
             >
               آپلود لیست شماره ها
             </Button>
           </Upload>
-          <Button_component ButtonClass="bg-[#2DCEA2] w-max sm:mr-3 px-4 py-2 mr-4 sm:mr-2 text-xs font-bold h-10 flex justify-center items-center">
+          <ButtonComponent ButtonClass="bg-secondary sm-max:w-1/2 w-max sm-max:mr-3 sm-max:px-10 px-20  lg-max:!px-5 2xl-max:px-10 py-2 mr-4 sm-max:mr-2 text-xs font-bold h-10 flex justify-center items-center">
             افزودن مخاطبین
-          </Button_component>
+          </ButtonComponent>
         </div>
       </div>
-      <div>
+      <div className="mt-3">
         <Form form={form} component={false}>
-          <ConfigProvider locale={fa_IR}>
-            <Table
-              components={{
-                body: {
-                  cell: EditableCell,
-                },
-              }}
-              bordered
-              dataSource={tableData}
-              columns={mergedColumns as ColumnTypes}
-              rowClassName="editable-row"
-              pagination={{
-                onChange: cancel,
-              }}
-            />
-          </ConfigProvider>
+          <CustomTable
+            size="large"
+            bordered
+            dataSource={tableData}
+            columns={mergedColumns as CustomColumnType<DataType>[]}
+            rowClassName="editable-row"
+            pagination={{
+              onChange: cancel,
+            }}
+            theme={"secondary"}
+          />
         </Form>
       </div>
     </div>
   );
 };
 
+export default UsersNote;
+
 // Types
 interface Item {
-  key: string,
-  firstName: string,
-  lastName: string,
-  birthdate:string ,
-  job: string,
-  phoneNumber: string,
-}
-
-type DataIndex = keyof DataType;
-type EditableTableProps = Parameters<typeof Table>[0];
-type ColumnTypes = Exclude<EditableTableProps['columns'], undefined>;
-
-interface EditableCellProps extends React.HTMLAttributes<HTMLElement> {
-  editing: boolean;
-  dataIndex: string;
-  title: string;
-  inputType: "number" | "text";
-  record: Item;
-  index: number;
-  children: React.ReactNode;
+  key: string;
+  firstName: string;
+  lastName: string;
+  birthdate: string;
+  job: string;
+  phoneNumber: string;
 }
 
 interface DataType {
   key: React.Key;
-  firstName: string,
-  lastName: string,
-  birthdate:string ,
-  job: string,
-  phoneNumber: string,
+  firstName: string;
+  lastName: string;
+  birthdate: string;
+  job: string;
+  phoneNumber: string;
 }

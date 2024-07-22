@@ -1,170 +1,288 @@
 import React from "react";
-import { Button, Input } from "antd";
+import { FaPlus } from "react-icons/fa";
+import { Link, useNavigate } from "react-router-dom";
 import { weekDays } from "../../../../Register/page";
-import TextArea from "../../../../components/TextArea";
-import DatePicker, { DateObject } from "react-multi-date-picker";
+import { H1Title, Parag } from "../../../../components/tools";
 import persian from "react-date-object/calendars/persian";
 import persian_fa from "react-date-object/locales/persian_fa";
-import Button_component from "../../../../components/Button";
-import { ArrowRightCircleIcon } from "@heroicons/react/24/outline";
-import { useNavigate } from "react-router-dom";
-import { HiOutlineMinusCircle } from "react-icons/hi";
-import { Parag } from "../../../../components/tools";
-import { FaPlus } from "react-icons/fa";
+import persian_en from "react-date-object/locales/persian_en";
+import DatePicker, { DateObject } from "react-multi-date-picker";
+import StepperWithContent from "../../../../components/stepper/stepper";
+import {
+  HiOutlineArrowCircleRight,
+  HiOutlineDocumentDuplicate,
+  HiOutlineMinusCircle,
+} from "react-icons/hi";
 import {
   appSlice,
-  selectShowModal,
+  fetchAddSurveyOptionsThunk,
+  fetchAddSurveyThunk,
+  fetchDeleteSurveyOptionsThunk,
+  fetchSurveyOptionsThunk,
+  selectActiveStep,
+  selectShowModals,
+  selectSurveyOptions,
+  selectUuid,
+  SurveySlice,
   useDispatch,
   useSelector,
 } from "../../../../../lib/redux";
-import Modal from "../../../../components/Modal";
+import { Form, Formik } from "formik";
+import TimePicker from "react-multi-date-picker/plugins/time_picker";
+import moment from "moment-jalaali";
+
+const Input = React.lazy(() => import("antd/es/input/index"));
+const Modal = React.lazy(() => import("../../../../components/Modal"));
+const Textarea = React.lazy(() => import("../../../../components/TextArea"));
+const ButtonComponent = React.lazy(
+  () => import("../../../../components/Button")
+);
 
 const AddSurvey: React.FC = () => {
-  const [degree, setDegree] = React.useState(["عالی", "خوب", "متوسط"]);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const showModal = useSelector(selectShowModal);
-  const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>): void => {};
+  const showModals = useSelector(selectShowModals);
+  const uuid = useSelector(selectUuid);
+  const surveyOptions = useSelector(selectSurveyOptions);
 
-  const handleDateChange = (date: DateObject | DateObject[] | null) => {
-    if (date instanceof DateObject) {
-      //   dispatch(
-      //     occasionalmessageSlice.actions.setsenddata(
-      //       date?.convert(persian, persian_fa).format().toString() ?? ""
-      //     )
-      //   );
-    }
+  const showModalHandler = (name: string) => {
+    dispatch(appSlice.actions.setShowModals(name));
   };
 
-  const handleCreateLottery = () => {
-    showModalHandler();
+  const handleCreateSurvey = () => {
+    showModalHandler("showModalConfirmSurvey");
+    dispatch(SurveySlice.actions.setActiveStep(2));
   };
 
-  const handleDelete = () => {};
-
-  const showModalHandler = () => {
-    dispatch(appSlice.actions.setShowModal());
+  const handleDelete = async (id: number) => {
+    await dispatch(fetchDeleteSurveyOptionsThunk({ uuid, id }));
+    await dispatch(fetchSurveyOptionsThunk({ uuid }));
   };
 
-  const goback = () => {
-    navigate("/store/Survey");
-    // dispatch(occasionalmessageSlice.actions.setTitleMessage(""));
-    // dispatch(occasionalmessageSlice.actions.settextmessage(""));
+  const handleCopy = () => {
+    navigator.clipboard.writeText(`https://front-irannet.liara.run/store/SurveyView/${uuid}`).then(() => {
+      alert("متن با موفقیت کپی شد!");
+    }).catch((err) => {
+      console.error("خطا در کپی کردن متن: ", err);
+    });
   };
+
+  const activeStep = useSelector(selectActiveStep);
 
   return (
-    // <div className="flex flex-col items-center justify-center min-h-screen p-6 mx-auto my-10 max-w-lg">
-    <div className="flex flex-col mx-auto justify-center min-h-screen items-center my-10 sm:w-80 w-96 ">
-
-      <p className="text-2xl p-1 text-right self-start font-semibold sm:text-base text-[#151515]">
-    فرم ایجاد و ویرایش نظرسنجی
-      </p>
-      <Input
-        value={""}
-        onChange={
-          (e) => {}
-          // dispatch(
-          //   occasionalmessageSlice.actions.setTitleMessage(e.target.value)
-          // )
-        }
-        placeholder="عنوان نظرسنجی"
-        className="mt-5 h-10"
-      />
-      <TextArea
-        ShowCount={true}
-        TextAreaClass="mt-3 h-44"
-        MaxLength={100}
-        Value={""}
-        onChange={handleChange}
-        Placeholder="متن سوال"
-      />
-      <div className="w-full flex flex-row items-center justify-between">
-        <Input
-          value={""}
-          onChange={
-            (e) => {}
-            // dispatch(
-            //   occasionalmessageSlice.actions.setTitleMessage(e.target.value)
-            // )
-          }
-          placeholder="متن گزینه ها"
-          className="outline-0 bg-white h-10 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block !w-full py-3 pr-4 mt-5"
-        />
-        <Button_component
-          disabled={false}
-          ButtonClass="border border-gray-300 rounded-lg mr-3.5 p-3 mt-5 bg-white"
-          onClick={() => {}}
-        >
-          <FaPlus className="h-3 w-3 text-blue-gray-300" />
-        </Button_component>
+    <section className="flex flex-col gap-24 px-6">
+      <div className="w-full flex max-w-lg mx-auto">
+        <StepperWithContent />
       </div>
-      <Parag
-        Paragraph={"حداکثر تعداد گزینه ها، 10 عدد می‌باشد"}
-        Pclass={"mt-2.5 text-sm font-normal text-blue-gray-400 self-start"}
-      />
-
-      {degree.map((item, index) => (
-        <div
-          key={index}
-          className="flex flex-row items-center justify-center gap-2 text-[#151515] w-full mt-3.5"
+      {activeStep === 0 ? (
+        <Formik
+          initialValues={{
+            title: "",
+            text: "",
+            start_time: "",
+            end_time: "",
+          }}
+          onSubmit={(values) => {
+            // Handle form submission
+            if (values) {
+              console.log("Final form values:", values);
+              dispatch(fetchAddSurveyThunk(values));
+            }
+            // You can perform further actions with the form values here
+          }}
         >
-          <Parag Paragraph={`${index + 1} .`} Pclass={""}></Parag>
-          <Parag Paragraph={item} Pclass="flex-grow" />
-          <HiOutlineMinusCircle
-            className="text-red-500 cursor-pointer"
-            onClick={handleDelete}
+          {({ handleChange, setFieldValue }) => (
+            <Form className="w-full flex flex-col min-h-screen items-center max-w-lg self-center">
+              <p
+                lang="fa"
+                role="text"
+                className="text-2xl p-1 text-right self-start font-semibold sm-max:text-base text-textColor"
+              >
+                فرم ایجاد نظرسنجی و مسابقه
+              </p>
+              <Input
+                name="title"
+                onChange={handleChange}
+                placeholder="عنوان نظرسنجی"
+                className="mt-5 h-10"
+              />
+              <Textarea
+                Name="text"
+                ShowCount={true}
+                TextAreaClass="mt-3 h-44"
+                MaxLength={100}
+                onChange={handleChange}
+                Placeholder="متن نظرسنجی"
+              />
+              <DatePicker
+                name="start_time"
+                format="HH:mm:ss YYYY/MM/DD"
+                onChange={(date: DateObject | DateObject[] | null) => {
+                  if (date instanceof DateObject) {
+                    setFieldValue(
+                      "start_time",
+                      moment(
+                        date
+                          .convert(persian, persian_en)
+                          .format("YYYY-MM-DD HH:mm:ss")
+                          .toString(),
+                        "jYYYY/jMM/jDD HH:mm:ss"
+                      )
+                        .format("YYYY-MM-DD HH:mm:ss")
+                        .toString()
+                    );
+                  }
+                }}
+                weekDays={weekDays}
+                className="custom-calendar"
+                calendar={persian}
+                locale={persian_fa}
+                inputClass="outline-0 w-full mt-5 bg-white h-10 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500  p-3"
+                placeholder="تاریخ و ساعت شروع"
+                plugins={[<TimePicker position="bottom" />]}
+              />
+              <DatePicker
+                name="end_time"
+                format="HH:mm:ss YYYY/MM/DD"
+                onChange={(date: DateObject | DateObject[] | null) => {
+                  if (date instanceof DateObject) {
+                    setFieldValue(
+                      "end_time",
+                      moment(
+                        date
+                          .convert(persian, persian_en)
+                          .format("YYYY-MM-DD HH:mm:ss")
+                          .toString(),
+                        "jYYYY/jMM/jDD HH:mm:ss"
+                      )
+                        .format("YYYY-MM-DD HH:mm:ss")
+                        .toString()
+                    );
+                  }
+                }}
+                weekDays={weekDays}
+                className="custom-calendar"
+                calendar={persian}
+                locale={persian_fa}
+                inputClass="outline-0 w-full mt-5 bg-white h-10 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-3"
+                placeholder="تاریخ و ساعت پایان"
+                plugins={[<TimePicker position="bottom" />]}
+              />
+              <ButtonComponent
+                Type="submit"
+                disabled={false}
+                ButtonClass="bg-secondary w-full mx-auto mt-10 text-xs font-bold sm-max:p-3 h-11 flex justify-center items-center"
+              >
+                ایجاد نظرسنجی
+              </ButtonComponent>
+              <Link to="/store/Survey" className="w-full">
+                <ButtonComponent
+                  onClick={() => {
+                    dispatch(SurveySlice.actions.setActiveStep(0));
+                  }}
+                  ButtonClass="flex items-center justify-center mt-1 mx-auto bg-white shadow-none hover:shadow-none"
+                >
+                  <div className="flex items-center gap-2 text-sm text-textColor font-medium">
+                    <HiOutlineArrowCircleRight
+                      className={"h-3.5 w-3.5 mx-auto text-[#E53935]"}
+                    />
+                    <div>
+                      <span className="text-[#757575]">لغو عملیات و</span> برگشت
+                      به داشبورد
+                    </div>
+                  </div>
+                </ButtonComponent>
+              </Link>
+            </Form>
+          )}
+        </Formik>
+      ) : (
+        <section className="w-full max-w-lg self-center">
+          <Formik
+            initialValues={{
+              title: "",
+            }}
+            onSubmit={(values) => {
+              // Handle form submission
+              if (values) {
+                console.log("Final form values:", values);
+                dispatch(
+                  fetchAddSurveyOptionsThunk({ uuid, title: values.title })
+                ).unwrap();
+              }
+              // You can perform further actions with the form values here
+            }}
+          >
+            {({ handleChange }) => (
+              <>
+                <H1Title
+                  BoldTitle={"گزینه های نظرسنجی و مسابقه"}
+                  H1class={"h-9 text-2xl text-right font-semibold"}
+                />
+                <Form className="w-full flex flex-row items-center justify-between">
+                  <Input
+                    onChange={handleChange}
+                    placeholder="متن گزینه ها"
+                    className="outline-0 bg-white h-10 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block !w-full py-3 pr-4 mt-5"
+                    name="title"
+                  />
+                  <ButtonComponent
+                    Type="submit"
+                    ButtonClass="border border-gray-300 rounded-lg mr-3.5 p-3 mt-5 bg-white"
+                  >
+                    <FaPlus className="h-3 w-3 text-blue-gray-300" />
+                  </ButtonComponent>
+                </Form>
+              </>
+            )}
+          </Formik>
+          <Parag
+            Paragraph={"حداکثر تعداد گزینه ها، 10 عدد می‌باشد"}
+            Pclass={"mt-2.5 text-sm font-normal text-blue-gray-400 self-start"}
           />
-        </div>
-      ))}
 
-      <DatePicker
-        format="YYYY/MM/DD"
-        // value={""}
-        // onChange={(date) => handleDateChange(date)}
-        weekDays={weekDays}
-        className="custom-calendar"
-        calendar={persian}
-        locale={persian_fa}
-        inputClass="outline-0 w-full mt-5 bg-white h-10 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500  p-3"
-        placeholder="تاریخ شروع"
-      />
-      <DatePicker
-        format="YYYY/MM/DD"
-        // value={""}
-        // onChange={(date) => handleDateChange(date)}
-        weekDays={weekDays}
-        className="custom-calendar"
-        calendar={persian}
-        locale={persian_fa}
-        inputClass="outline-0 w-full mt-5 bg-white h-10 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-3"
-        placeholder="تاریخ پایان"
-      />
-      <Button_component
-        disabled={false}
-        ButtonClass="bg-[#2DCEA2] w-full mx-auto mt-10 text-xs font-bold h-11 flex justify-center items-center"
-        onClick={() => handleCreateLottery()}
-      >
-        ایجاد نظرسنجی
-      </Button_component>
-
-      <Button
-        onClick={goback}
-        type="link"
-        className="flex items-center justify-center mt-1 mb-5 mx-auto"
-        icon={
-          <ArrowRightCircleIcon
-            color="#E53935"
-            strokeWidth={2.5}
-            className={"h-3.5 w-3.5 mx-auto"}
-          />
-        }
-      >
-        <span className="text-sm text-[#151515] font-medium ">
-          <span className="text-[#757575]">لغو عملیات و</span> برگشت به داشبورد
-        </span>
-      </Button>
-
+          {surveyOptions?.map((item, index) => (
+            <div
+              key={index}
+              className="flex flex-row items-center justify-center gap-2 text-textColor w-full mt-3.5"
+            >
+              <Parag Paragraph={`${index + 1} .`} Pclass={""}></Parag>
+              <Parag Paragraph={item.title} Pclass="flex-grow" />
+              <HiOutlineMinusCircle
+                className="text-red-500 cursor-pointer"
+                onClick={() => handleDelete(item.id)}
+              />
+            </div>
+          ))}
+          <ButtonComponent
+            disabled={false}
+            ButtonClass="bg-secondary w-full mx-auto mt-10 text-xs font-bold sm-max:p-3 h-11 flex justify-center items-center"
+            onClick={handleCreateSurvey}
+          >
+            ایجاد نظرسنجی
+          </ButtonComponent>
+          <Link to="/store/Survey" className="w-full">
+            <ButtonComponent
+              onClick={() => {
+                dispatch(SurveySlice.actions.setActiveStep(0));
+              }}
+              ButtonClass="flex items-center justify-center mt-1 mx-auto bg-white shadow-none hover:shadow-none"
+            >
+              <div className="flex items-center gap-2 text-sm text-textColor font-medium">
+                <HiOutlineArrowCircleRight
+                  className={"h-3.5 w-3.5 mx-auto text-[#E53935]"}
+                />
+                <div>
+                  <span className="text-[#757575]">لغو عملیات و</span> برگشت به
+                  داشبورد
+                </div>
+              </div>
+            </ButtonComponent>
+          </Link>
+        </section>
+      )}
       <Modal
+        modalClass="sm-max:!min-w-[90%] !min-w-[30%]"
         modalHeaderClass="flex flex-row justify-between"
         modalHeader={
           <>
@@ -179,39 +297,50 @@ const AddSurvey: React.FC = () => {
               Paragraph={"لینک صفحۀ عمومی شرکت در نظرسنجی:"}
               Pclass={"text-base font-normal text-blue-gray-500 mb-4"}
             />
-            <div className="container relative inline-flex items-center">
+            <div className="container flex items-center gap-3">
+              <ButtonComponent
+                ButtonClass={
+                  "flex shrink-0 items-center justify-center h-8 sm-max:!p-3 bg-white border border-blue-gray-100 text-xs font-bold h-full"
+                }
+                onClick={handleCopy}
+              >
+                <HiOutlineDocumentDuplicate className="w-5 h-5 text-blue-gray-300" />
+              </ButtonComponent>
               <Input
-                dir="ltr"
-                placeholder="https://link.com/link_link"
-                className="absolute flex items-center justify-center gap-2.5 flex-grow flex-shrink-0 rounded-lg border-blue-gray-100 h-10 py-3 pl-3 pr-1.5 placeholder:leading-tight placeholder:text-sm placeholder:font-normal placeholder:text-blue-gray-300 cursor-auto"
+                style={{ direction: 'ltr', textAlign: 'left' }}
+                placeholder={`https://front-irannet.liara.run/store/SurveyView/${uuid}`}
+                className="flex items-center justify-center gap-2.5 flex-grow rounded-lg border-blue-gray-100 h-full py-3 pl-3 pr-1.5 placeholder:leading-tight placeholder:text-sm placeholder:font-normal placeholder:text-blue-gray-300 cursor-auto"
                 readOnly
               />
-              <Button_component
-                ButtonClass={
-                  "flex shrink-0 items-center justify-center relative -left-1 h-8 sm:!p-3 bg-blue-gray-300 text-xs font-bold ml-64"
-                }
-              >
-                کپی کردن
-              </Button_component>
             </div>
           </>
         }
         modalFooter={
-          <Button_component
-            onClick={()=> {
-              showModalHandler();
-              goback();
-            }}
-            ButtonClass="bg-secondary text-xs font-bold text-white h-10 flex items-center justify-center"
-          >
-            برگشت به داشبورد
-          </Button_component>
+          <div className="w-full flex gap-4">
+            <ButtonComponent
+              onClick={() => navigate(`/store/SurveyView/${uuid}`)}
+              ButtonClass="w-full bg-white text-xs font-bold text-black h-10 flex items-center justify-center border border-[#2DCEA2]"
+            >
+              مشاهده نظرسنجی
+            </ButtonComponent>
+            <Link to="/store/Survey" className="w-full">
+              <ButtonComponent
+                onClick={() => {
+                  showModalHandler("showModalConfirmSurvey");
+                  dispatch(SurveySlice.actions.setActiveStep(0));
+                }}
+                ButtonClass="bg-secondary text-xs font-bold text-white h-10 flex items-center justify-center w-48"
+              >
+                برگشت به داشبورد
+              </ButtonComponent>
+            </Link>
+          </div>
         }
         modalFooterClass="flex items-center justify-center"
-        Open={showModal}
-        HandleOpen={showModalHandler}
+        Open={showModals.showModalConfirmSurvey}
+        HandleOpen={() => showModalHandler("showModalConfirmSurvey")}
       />
-    </div>
+    </section>
   );
 };
 
